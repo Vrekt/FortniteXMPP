@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+}
+
+group 'me.vrekt'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 11
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.igniterealtime.smack', name: 'smack-tcp', version: '4.3.1'
+    compile group: 'org.igniterealtime.smack', name: 'smack-extensions', version: '4.3.1'
+    compile group: 'org.igniterealtime.smack', name: 'smack-java7', version: '4.3.1'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.8.1'
+    compile group: 'com.google.guava', name: 'guava', version: '27.0.1-jre'
+    compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
+    compile group: 'io.github.robertograham', name: 'fortnite-2', version: '3.1.0'
+    compile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.4.0'
+}
