@@ -3,7 +3,7 @@ A library for interacting with Fortnite's XMPP service, manage parties, collect 
 
 # Credits
 - [Kysune](https://github.com/SzymonLisowiec)
-- [RoberoGraham)(https://github.com/RobertoGraham/fortnite-2)
+- [RoberoGraham](https://github.com/RobertoGraham/fortnite-2)
 - [lorpus](https://github.com/lorpus/fnpaktrack)
 
 # Documentation
