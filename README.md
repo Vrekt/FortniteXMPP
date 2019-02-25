@@ -14,5 +14,11 @@ Most of the source is documented, over time I will also expand upon it and make 
 
 Discord help: vrekt#4387
 
+# Features
+  - Mostly complete party support
+  - Presence support
+  - Friend support, (events for friend stuff)
+  - Chat support, (send messages to members)
+
 # Disclaimer
 I am not responsible for any trouble you get into while using this library. I suggest you do not abuse the party system and the XMPP system in general.
