@@ -59,11 +59,11 @@ public final class PartyConfiguration {
     public enum Permissions {
 
         // TODO: Watch this, make sure they don't change!
-        PUBLIC(3, 7, 0),
+        PUBLIC(32515, 7, 0),
         FRIENDS_WITHOUT_OTHER_FRIENDS(1, 7, 0),
-        FRIENDS(3, 7, 0),
+        FRIENDS(32515, 7, 0),
         PRIVATE_WITHOUT_OTHER_FRIENDS(1, 6, 7),
-        PRIVATE(3, 6, 7);
+        PRIVATE(32515, 6, 7);
 
         private final int invitePermissions, partyFlags, notAcceptingMembersReason;
 

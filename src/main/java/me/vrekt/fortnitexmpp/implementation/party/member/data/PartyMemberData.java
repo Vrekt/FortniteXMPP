@@ -5,6 +5,8 @@ import me.vrekt.fortnitexmpp.implementation.party.InputType;
 import me.vrekt.fortnitexmpp.implementation.party.member.battlepass.BattlePass;
 import me.vrekt.fortnitexmpp.implementation.party.member.cosmetic.Backbling;
 import me.vrekt.fortnitexmpp.implementation.party.member.cosmetic.Skin;
+import me.vrekt.fortnitexmpp.implementation.party.packet.PacketBuilder;
+import me.vrekt.fortnitexmpp.implementation.party.packet.PartyPacketType;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -78,7 +80,7 @@ public final class PartyMemberData {
         attributes.add("PlatformUniqueId_s", "INVALID");
         attributes.add("PlatformSessionId_s", "");
         attributes.add("CrossplayPreference_s", "OptedIn");
-        payload.add("Rev", 1);
+        payload.add("Rev", PacketBuilder.getRevForType(PartyPacketType.PARTY_MEMBER_DATA));
         payload.add("Attrs", attributes.build());
         this.payload = payload.build();
     }
@@ -105,7 +107,7 @@ public final class PartyMemberData {
         attributes.add("CampaignHero_j", Json.createObjectBuilder().add("CampaignHero", heroData).build());
         var cosmeticLoadout = buildCharacterDefinition(builder, true);
         attributes.add("AthenaCosmeticLoadout_j", Json.createObjectBuilder().add("AthenaCosmeticLoadout", cosmeticLoadout).build());
-        payload.add("Rev", 1);
+        payload.add("Rev", PacketBuilder.getRevForType(PartyPacketType.PARTY_MEMBER_DATA));
         payload.add("Attrs", attributes.build());
         this.payload = payload.build();
     }
@@ -121,7 +123,7 @@ public final class PartyMemberData {
         attributes.add("CampaignHero_j", Json.createObjectBuilder().add("CampaignHero", Json.createObjectBuilder().build()).build());
         var cosmeticLoadout = buildCharacterDefinition(builder, false);
         attributes.add("AthenaCosmeticLoadout_j", Json.createObjectBuilder().add("AthenaCosmeticLoadout", cosmeticLoadout).build());
-        payload.add("Rev", 1);
+        payload.add("Rev", PacketBuilder.getRevForType(PartyPacketType.PARTY_MEMBER_DATA));
         payload.add("Attrs", attributes.build());
         this.payload = payload.build();
     }
@@ -168,7 +170,7 @@ public final class PartyMemberData {
         var payload = Json.createObjectBuilder();
         var attributes = Json.createObjectBuilder();
 
-        payload.add("Rev", 2);
+        payload.add("Rev", PacketBuilder.getRevForType(PartyPacketType.PARTY_MEMBER_DATA));
         attributes.add("IsReadyAthena_b", builder.isReady);
         attributes.add("ReadyInputType_s", builder.inputType);
         payload.add("Attrs", attributes.build());
@@ -184,7 +186,7 @@ public final class PartyMemberData {
         var payload = Json.createObjectBuilder();
         var attributes = Json.createObjectBuilder();
 
-        payload.add("Rev", 3);
+        payload.add("Rev", PacketBuilder.getRevForType(PartyPacketType.PARTY_MEMBER_DATA));
         attributes.add("hasPreloadedAthena_b", builder.preloaded);
         payload.add("Attrs", attributes.build());
         this.payload = payload.build();
@@ -199,7 +201,7 @@ public final class PartyMemberData {
         var payload = Json.createObjectBuilder();
         var attributes = Json.createObjectBuilder();
 
-        payload.add("Rev", 3);
+        payload.add("Rev", PacketBuilder.getRevForType(PartyPacketType.PARTY_MEMBER_DATA));
         attributes.add("NumAthenaPlayersLeft_U", builder.playersLeft);
         payload.add("Attrs", attributes.build());
         this.payload = payload.build();

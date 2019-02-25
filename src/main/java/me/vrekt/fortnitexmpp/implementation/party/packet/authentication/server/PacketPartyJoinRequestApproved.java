@@ -5,6 +5,7 @@ import me.vrekt.fortnitexmpp.implementation.party.member.PartyMember;
 import me.vrekt.fortnitexmpp.implementation.party.packet.PacketBuilder;
 import me.vrekt.fortnitexmpp.implementation.party.packet.PartyPacket;
 import me.vrekt.fortnitexmpp.implementation.party.packet.PartyPacketType;
+import me.vrekt.fortnitexmpp.implementation.party.packet.configuration.PartyConfiguration;
 import org.jxmpp.jid.Jid;
 
 import javax.json.Json;
@@ -55,24 +56,23 @@ public final class PacketPartyJoinRequestApproved implements PartyPacket {
     /**
      * Initialize the packet
      *
-     * @param partyId             the ID of the party
-     * @param key                 the key of the party
-     * @param memberList          the member list, usually the already created party object would have this or you stored it yourself.
-     * @param presencePermissions the presence permissions, this seems to be a random value each time, but I always make it "-1692261632"
-     * @param maxMembers          the max members allowed for this party
-     * @param to                  who the packet is to
+     * @param partyId       the ID of the party
+     * @param key           the key of the party
+     * @param memberList    the member list, usually the already created party object would have this or you stored it yourself.
+     * @param configuration the party configuration
+     * @param to            who the packet is to
      */
-    public PacketPartyJoinRequestApproved(String partyId, String key, Set<PartyMember> memberList, long presencePermissions, int maxMembers, Jid to) {
+    public PacketPartyJoinRequestApproved(String partyId, String key, Set<PartyMember> memberList, PartyConfiguration configuration, Jid to) {
         final var type = PartyPacketType.PARTY_JOIN_REQUEST_APPROVED;
         this.to = to;
         var payload = Json.createObjectBuilder();
 
         payload.add("partyId", partyId);
-        payload.add("presencePermissions", presencePermissions);
-        payload.add("invitePermissions", 3);
-        payload.add("partyFlags", 3);
-        payload.add("notAcceptingMembersReason", 0);
-        payload.add("maxMembers", maxMembers);
+        payload.add("presencePermissions", configuration.getPresencePermissions());
+        payload.add("invitePermissions", configuration.getPermissions().getInvitePermissions());
+        payload.add("partyFlags", configuration.getPermissions().getPartyFlags());
+        payload.add("notAcceptingMembersReason", configuration.getPermissions().getNotAcceptingMembersReason());
+        payload.add("maxMembers", configuration.getMaxMembers());
         payload.add("password", "");
         payload.add("accessKey", key);
 

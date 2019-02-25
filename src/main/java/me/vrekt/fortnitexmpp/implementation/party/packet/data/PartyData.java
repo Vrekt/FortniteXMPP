@@ -1,5 +1,8 @@
 package me.vrekt.fortnitexmpp.implementation.party.packet.data;
 
+import me.vrekt.fortnitexmpp.implementation.party.packet.PacketBuilder;
+import me.vrekt.fortnitexmpp.implementation.party.packet.PartyPacketType;
+
 import javax.json.Json;
 import javax.json.JsonObject;
 
@@ -34,10 +37,10 @@ public final class PartyData {
         var payload = Json.createObjectBuilder();
         var attributes = Json.createObjectBuilder();
 
-        payload.add("Rev", 1);
+        payload.add("Rev", PacketBuilder.getRevForType(PartyPacketType.PARTY_DATA));
         attributes.add("PartyState_s", "BattleRoyaleMatchmaking");
         attributes.add("MatchmakingInfoString_s", builder.matchmakingInfoString);
-        payload.add("attrs", attributes.build());
+        payload.add("Attrs", attributes.build());
         this.payload = payload.build();
     }
 
@@ -50,13 +53,13 @@ public final class PartyData {
         var payload = Json.createObjectBuilder();
         var attributes = Json.createObjectBuilder();
 
-        payload.add("Rev", 1);
+        payload.add("Rev", PacketBuilder.getRevForType(PartyPacketType.PARTY_DATA));
         attributes.add("PlaylistData_j", Json.createObjectBuilder().add("PlaylistData",
                 Json.createObjectBuilder()
                         .add("playlistName", builder.playlistName)
                         .add("tournamentId", "")
                         .add("eventWindowId", "").build()).build());
-        payload.add("attrs", attributes.build());
+        payload.add("Attrs", attributes.build());
         this.payload = payload.build();
     }
 
@@ -69,9 +72,9 @@ public final class PartyData {
         var payload = Json.createObjectBuilder();
         var attributes = Json.createObjectBuilder();
 
-        payload.add("Rev", 1);
+        payload.add("Rev", PacketBuilder.getRevForType(PartyPacketType.PARTY_DATA));
         attributes.add("CustomMatchKey_s", builder.customKey);
-        payload.add("attrs", attributes.build());
+        payload.add("Attrs", attributes.build());
         this.payload = payload.build();
     }
 
@@ -85,13 +88,13 @@ public final class PartyData {
         var attributes = Json.createObjectBuilder();
         var privacyData = Json.createObjectBuilder();
 
-        payload.add("Rev", 1);
+        payload.add("Rev", PacketBuilder.getRevForType(PartyPacketType.PARTY_DATA));
 
         privacyData.add("partyType", builder.partyType);
         privacyData.add("partyInviteRestriction", builder.partyInviteRestriction);
         privacyData.add("bOnlyLeaderFriendsCanJoin", builder.onlyLeaderFriendsCanJoin);
         attributes.add("PrivacySettings_j", Json.createObjectBuilder().add("PrivacySettings", privacyData.build()).build());
-        payload.add("attrs", attributes.build());
+        payload.add("Attrs", attributes.build());
         this.payload = payload.build();
     }
 
@@ -105,7 +108,7 @@ public final class PartyData {
         var attributes = Json.createObjectBuilder();
         var privacyData = Json.createObjectBuilder();
 
-        payload.add("Rev", 1);
+        payload.add("Rev", PacketBuilder.getRevForType(PartyPacketType.PARTY_DATA));
 
         attributes.add("PrimaryGameSessionId_s", "");
         attributes.add("PartyState_s", "BattleRoyaleView");
@@ -113,7 +116,7 @@ public final class PartyData {
         attributes.add("MatchmakingResult_s", "NoResults");
         attributes.add("MatchmakingState_s", "NotMatchmaking");
         attributes.add("SessionIsCriticalMission_b", false);
-        attributes.add("ZoneTileIndex_U", -1);
+        attributes.add("ZoneTileIndex_U", "-1");
         attributes.add("ZoneInstanceId_s", "");
         attributes.add("TheaterId_s", "");
         attributes.add("TileStates_j", Json.createObjectBuilder().add("TileStates", Json.createArrayBuilder().build()).build());
@@ -135,7 +138,7 @@ public final class PartyData {
         privacyData.add("bOnlyLeaderFriendsCanJoin", builder.onlyLeaderFriendsCanJoin);
         attributes.add("PrivacySettings_j", Json.createObjectBuilder().add("PrivacySettings", privacyData.build()).build());
         attributes.add("PlatformSessions_j", Json.createObjectBuilder().add("PlatformSessions", Json.createArrayBuilder().build()).build());
-        payload.add("attrs", attributes.build());
+        payload.add("Attrs", attributes.build());
         this.payload = payload.build();
     }
 

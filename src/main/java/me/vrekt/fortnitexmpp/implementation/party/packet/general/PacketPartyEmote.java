@@ -64,7 +64,7 @@ public final class PacketPartyEmote implements PartyPacket {
         emoteData.add("emoteSection", stage);
         attributes.add("FrontendEmote_j", Json.createObjectBuilder().add("FrontendEmote", emoteData.build()).build());
 
-        payload.add("Rev", 1);
+        payload.add("Rev", PacketBuilder.getRevForType(PartyPacketType.PARTY_MEMBER_DATA));
         payload.add("Attrs", attributes.build());
         this.payload = PacketBuilder.buildPacketDoublePayload(party.getId(), payload.build(), type).toString();
     }
