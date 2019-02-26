@@ -13,6 +13,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.jxmpp.jid.Jid;
 
 import javax.json.JsonObject;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,6 +22,8 @@ public class Party {
     // TODO: Update build ID without having to change source
     // TODO: Build ID is changed every major Fortnite update.
     // TODO: It seems minor updates, like small client updates or performance patches do not affect build ID.
+    // TODO: CURRENT 7.4
+    // TODO: NEXT CHANGE = SEASON 8 (2-3 days) // 2/25/18
     public static final String DEFAULT_BUILD_ID = "4774386";
 
     private final String id, accessKey;
@@ -103,6 +106,25 @@ public class Party {
         var dataPacket = new PacketPartyData(this, dataBuilder.build());
         service.sendPacketTo(configurationPacket, to);
         service.sendPacketTo(dataPacket, to);
+    }
+
+    /**
+     * Sends the current configuration to all party members
+     *
+     * @param service the party service
+     */
+    public void sendPrivacyConfigurationToAll(PartyService service) {
+        members.forEach(member -> sendPrivacyConfigurationTo(service, member.getJid()));
+    }
+
+    /**
+     * Sends the current configuration to all members in the collection
+     *
+     * @param service the service
+     * @param members a list of members in the party
+     */
+    public void sendPrivacyConfiguratioToAll(PartyService service, Collection<PartyMember> members) {
+        members.forEach(member -> sendPrivacyConfigurationTo(service, member.getJid()));
     }
 
     public PartyConfiguration getConfiguration() {

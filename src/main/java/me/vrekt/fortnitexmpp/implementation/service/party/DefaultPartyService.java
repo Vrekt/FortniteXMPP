@@ -10,6 +10,7 @@ import me.vrekt.fortnitexmpp.implementation.party.event.invite.PartyInvitationRe
 import me.vrekt.fortnitexmpp.implementation.party.event.join.PartyJoinRequestApprovedEvent;
 import me.vrekt.fortnitexmpp.implementation.party.event.join.PartyJoinRequestEvent;
 import me.vrekt.fortnitexmpp.implementation.party.event.join.PartyQueryJoinabilityEvent;
+import me.vrekt.fortnitexmpp.implementation.party.event.join.PartyQueryJoinabilityResponseEvent;
 import me.vrekt.fortnitexmpp.implementation.party.event.member.PartyMemberExitedEvent;
 import me.vrekt.fortnitexmpp.implementation.party.event.member.PartyMemberJoinedEvent;
 import me.vrekt.fortnitexmpp.implementation.party.event.member.PartyMemberPromotedEvent;
@@ -129,9 +130,9 @@ public final class DefaultPartyService implements PartyService {
             listeners.forEach(listener -> listener.onMessageReceived(message));
 
             try {
-                    var reader = Json.createReader(new StringReader(message.getBody()));
-                    var data = reader.readObject();
-                    reader.close();
+                var reader = Json.createReader(new StringReader(message.getBody()));
+                var data = reader.readObject();
+                reader.close();
 
                 var payload = data.getJsonObject("payload");
                 var type = data.getString("type");
@@ -181,7 +182,8 @@ public final class DefaultPartyService implements PartyService {
                 listeners.forEach(listener -> listener.onPartyQueryJoinability(partyQueryJoinabilityEvent));
                 break;
             case PARTY_QUERY_JOINABILITY_RESPONSE:
-                listeners.forEach(listener -> listener.onPartyQueryJoinabilityResponse(party, from));
+                final var partyQueryJoinabilityResponseEvent = new PartyQueryJoinabilityResponseEvent(party, payload, from);
+                listeners.forEach(listener -> listener.onPartyQueryJoinabilityResponse(partyQueryJoinabilityResponseEvent));
                 break;
             case PARTY_MEMBER_DATA:
                 listeners.forEach(listener -> listener.onPartyMemberData(party, PartyMemberData.newBuilder(MemberDataBuildType.OTHER_MEMBER).setPayload(payload).build(), from));

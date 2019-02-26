@@ -6,6 +6,7 @@ import me.vrekt.fortnitexmpp.implementation.party.event.invite.PartyInvitationEv
 import me.vrekt.fortnitexmpp.implementation.party.event.invite.PartyInvitationResponseEvent;
 import me.vrekt.fortnitexmpp.implementation.party.event.join.PartyJoinRequestApprovedEvent;
 import me.vrekt.fortnitexmpp.implementation.party.event.join.PartyJoinRequestEvent;
+import me.vrekt.fortnitexmpp.implementation.party.event.join.PartyQueryJoinabilityResponseEvent;
 import me.vrekt.fortnitexmpp.implementation.party.event.member.PartyMemberExitedEvent;
 import me.vrekt.fortnitexmpp.implementation.party.event.member.PartyMemberJoinedEvent;
 import me.vrekt.fortnitexmpp.implementation.party.event.member.PartyMemberPromotedEvent;
@@ -91,9 +92,9 @@ public interface PartyListener {
     /**
      * Invoked when a response to check the joinability of a party is received.
      *
-     * @param party the party
+     * @param event the event
      */
-    default void onPartyQueryJoinabilityResponse(Party party, Jid from) {
+    default void onPartyQueryJoinabilityResponse(PartyQueryJoinabilityResponseEvent event) {
 
     }
 
