@@ -113,13 +113,13 @@ public final class DefaultPresenceService implements PresenceService {
      * @param presence the presence
      */
     private void handlePresence(Presence presence) {
-        var localPart = presence.getFrom().getLocalpartOrNull();
+        final var localPart = presence.getFrom().getLocalpartOrNull();
         if (localPart == null) return;
 
-        var accountId = localPart.asUnescapedString();
+        final var accountId = localPart.asUnescapedString();
         if (presence.getStatus() == null) return;
 
-        var fortnitePresence = new DefaultFortnitePresence(accountId, presence.getStatus(), presence.getFrom());
+        final var fortnitePresence = new DefaultFortnitePresence(accountId, presence.getStatus(), presence.getFrom());
         listeners.forEach(listener -> listener.handlePresence(fortnitePresence));
         handlers.stream().filter(handler -> handler.isActive() && handler.isReady() && handler.isRelevant(accountId)).forEach(handler -> handler.handlePresence(fortnitePresence));
     }
@@ -128,7 +128,7 @@ public final class DefaultPresenceService implements PresenceService {
         @Override
         public void processStanza(Stanza packet) {
             if (!(packet instanceof Presence)) return;
-            var presence = (Presence) packet;
+            final var presence = (Presence) packet;
             if (onlyHandleAvailablePresences && !presence.isAvailable()) return;
             handlePresence(presence);
         }

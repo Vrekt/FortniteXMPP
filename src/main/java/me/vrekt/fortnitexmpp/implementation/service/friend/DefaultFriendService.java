@@ -63,15 +63,15 @@ public final class DefaultFriendService implements FriendService {
         public void processStanza(Stanza packet) {
             try {
                 if (!(packet instanceof Message)) return;
-                Message message = (Message) packet;
+                final var message = (Message) packet;
                 if (message.getType() != Message.Type.normal) return;
 
-                var reader = Json.createReader(new StringReader(message.getBody()));
-                var data = reader.readObject();
+                final var reader = Json.createReader(new StringReader(message.getBody()));
+                final var data = reader.readObject();
                 reader.close();
 
-                var typeParse = JsonUtility.getString("type", data).orElse("UNKNOWN");
-                var type = FriendPacketType.from(typeParse);
+                final var typeParse = JsonUtility.getString("type", data).orElse("UNKNOWN");
+                final var type = FriendPacketType.from(typeParse);
                 if (type == FriendPacketType.UNKNOWN) return;
 
                 listeners.forEach(listener -> listener.onFriendMessage(message));
@@ -86,11 +86,11 @@ public final class DefaultFriendService implements FriendService {
     private void postFriendEvent(JsonObject payload, FriendPacketType type) {
         switch (type) {
             case FRIENDSHIP_REQUEST:
-                var status = FriendRequest.Status.valueOf(payload.getString("status"));
+                final var status = FriendRequest.Status.valueOf(payload.getString("status"));
                 handleStatus(payload, status);
                 break;
             case FRIENDSHIP_REMOVE:
-                var reason = FriendRequest.Status.valueOf(payload.getString("reason"));
+                final var reason = FriendRequest.Status.valueOf(payload.getString("reason"));
                 handleStatus(payload, reason);
                 break;
         }

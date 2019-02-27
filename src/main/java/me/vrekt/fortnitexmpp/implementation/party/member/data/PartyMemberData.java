@@ -39,18 +39,18 @@ public final class PartyMemberData {
      * @param builder the builder
      */
     private void initializeMember(Builder builder) {
-        var payload = Json.createObjectBuilder();
-        var attributes = Json.createObjectBuilder();
+        final var payload = Json.createObjectBuilder();
+        final var attributes = Json.createObjectBuilder();
         attributes.add("Location_s", builder.location);
 
-        var heroData = buildHeroDefinition(builder);
+        final var heroData = buildHeroDefinition(builder);
         attributes.add("CampaignHero_j", Json.createObjectBuilder().add("CampaignHero", heroData).build());
         attributes.add("MatchmakingLevel_U", "0");
         attributes.add("ZoneInstanceId_s", "");
         attributes.add("HomeBaseVersion_U", "1");
         attributes.add("HasPreloadedAthena_b", builder.preloaded);
 
-        var frontendData = Json.createObjectBuilder();
+        final var frontendData = Json.createObjectBuilder();
         frontendData.add("emoteItemDef", "None");
         frontendData.add("emoteItemDefEncryptionKey", "");
         frontendData.add("emoteSection", -1);
@@ -62,15 +62,15 @@ public final class PartyMemberData {
         attributes.add("ReadyInputType_s", builder.inputType);
         attributes.add("CurrentInputType_s", builder.inputType);
 
-        var cosmeticLoadout = buildCharacterDefinition(builder, true);
+        final var cosmeticLoadout = buildCharacterDefinition(builder, true);
         attributes.add("AthenaCosmeticLoadout_j", Json.createObjectBuilder().add("AthenaCosmeticLoadout", cosmeticLoadout).build());
-        var bannerData = Json.createObjectBuilder();
+        final var bannerData = Json.createObjectBuilder();
         bannerData.add("bannerIconId", builder.bannerIcon);
         bannerData.add("bannerColorId", builder.bannerColor);
         bannerData.add("seasonLevel", builder.seasonLevel);
         attributes.add("AthenaBannerInfo_j", Json.createObjectBuilder().add("AthenaBannerInfo", bannerData.build()).build());
 
-        var battlePassData = Json.createObjectBuilder();
+        final var battlePassData = Json.createObjectBuilder();
         battlePassData.add("bHasPurchasedPass", builder.battlePass.hasPurchased());
         battlePassData.add("passLevel", builder.battlePass.getPassLevel());
         battlePassData.add("selfBoostXp", builder.battlePass.getSelfBoostXp());
@@ -100,12 +100,12 @@ public final class PartyMemberData {
      * @param builder the builder
      */
     private void initializeSkinChange(Builder builder) {
-        var payload = Json.createObjectBuilder();
-        var attributes = Json.createObjectBuilder();
+        final var payload = Json.createObjectBuilder();
+        final var attributes = Json.createObjectBuilder();
 
-        var heroData = buildHeroDefinition(builder);
+        final var heroData = buildHeroDefinition(builder);
         attributes.add("CampaignHero_j", Json.createObjectBuilder().add("CampaignHero", heroData).build());
-        var cosmeticLoadout = buildCharacterDefinition(builder, true);
+        final var cosmeticLoadout = buildCharacterDefinition(builder, true);
         attributes.add("AthenaCosmeticLoadout_j", Json.createObjectBuilder().add("AthenaCosmeticLoadout", cosmeticLoadout).build());
         payload.add("Rev", PacketBuilder.getRevForType(PartyPacketType.PARTY_MEMBER_DATA));
         payload.add("Attrs", attributes.build());
@@ -118,10 +118,10 @@ public final class PartyMemberData {
      * @param builder the builder
      */
     private void initializeBackblingChange(Builder builder) {
-        var payload = Json.createObjectBuilder();
-        var attributes = Json.createObjectBuilder();
+        final var payload = Json.createObjectBuilder();
+        final var attributes = Json.createObjectBuilder();
         attributes.add("CampaignHero_j", Json.createObjectBuilder().add("CampaignHero", Json.createObjectBuilder().build()).build());
-        var cosmeticLoadout = buildCharacterDefinition(builder, false);
+        final var cosmeticLoadout = buildCharacterDefinition(builder, false);
         attributes.add("AthenaCosmeticLoadout_j", Json.createObjectBuilder().add("AthenaCosmeticLoadout", cosmeticLoadout).build());
         payload.add("Rev", PacketBuilder.getRevForType(PartyPacketType.PARTY_MEMBER_DATA));
         payload.add("Attrs", attributes.build());
@@ -136,7 +136,7 @@ public final class PartyMemberData {
      * @return a {@link JsonObject} with skin/backbling values
      */
     private JsonObject buildCharacterDefinition(Builder builder, boolean includeCharacter) {
-        var cosmeticLoadout = Json.createObjectBuilder();
+        final var cosmeticLoadout = Json.createObjectBuilder();
         if (includeCharacter) {
             cosmeticLoadout.add("characterDefinition", "AthenaCharacterItemDefinition'/Game/Athena/Items/Cosmetics/Characters/" + builder.skin + "." + builder.skin + "'");
             cosmeticLoadout.add("characterDefinitionEncryptionKey", "");
@@ -154,7 +154,7 @@ public final class PartyMemberData {
      * @return a {@link JsonObject} with hero values
      */
     private JsonObject buildHeroDefinition(Builder builder) {
-        var heroData = Json.createObjectBuilder();
+        final var heroData = Json.createObjectBuilder();
         String heroName = builder.skin.replace("CID", "HID");
         heroData.add("heroItemInstanceId", "");
         heroData.add("heroType", "FortHeroType'/Game/Athena/Heroes/" + heroName + "." + heroName + "'");
@@ -167,8 +167,8 @@ public final class PartyMemberData {
      * @param builder the builder
      */
     private void initializeReady(Builder builder) {
-        var payload = Json.createObjectBuilder();
-        var attributes = Json.createObjectBuilder();
+        final var payload = Json.createObjectBuilder();
+        final var attributes = Json.createObjectBuilder();
 
         payload.add("Rev", PacketBuilder.getRevForType(PartyPacketType.PARTY_MEMBER_DATA));
         attributes.add("IsReadyAthena_b", builder.isReady);
@@ -183,8 +183,8 @@ public final class PartyMemberData {
      * @param builder the builder
      */
     private void initializePreload(Builder builder) {
-        var payload = Json.createObjectBuilder();
-        var attributes = Json.createObjectBuilder();
+        final var payload = Json.createObjectBuilder();
+        final var attributes = Json.createObjectBuilder();
 
         payload.add("Rev", PacketBuilder.getRevForType(PartyPacketType.PARTY_MEMBER_DATA));
         attributes.add("hasPreloadedAthena_b", builder.preloaded);
@@ -198,8 +198,8 @@ public final class PartyMemberData {
      * @param builder the builder
      */
     private void initializePlayersLeft(Builder builder) {
-        var payload = Json.createObjectBuilder();
-        var attributes = Json.createObjectBuilder();
+        final var payload = Json.createObjectBuilder();
+        final var attributes = Json.createObjectBuilder();
 
         payload.add("Rev", PacketBuilder.getRevForType(PartyPacketType.PARTY_MEMBER_DATA));
         attributes.add("NumAthenaPlayersLeft_U", builder.playersLeft);

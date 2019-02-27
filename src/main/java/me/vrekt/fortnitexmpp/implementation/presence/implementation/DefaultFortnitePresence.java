@@ -70,8 +70,8 @@ public final class DefaultFortnitePresence implements FortnitePresence {
         this.status = status;
 
         try {
-            var reader = Json.createReader(new StringReader(status));
-            var object = reader.readObject();
+            final var reader = Json.createReader(new StringReader(status));
+            final var object = reader.readObject();
             reader.close();
 
             final var partyJoinData = "party.joininfodata.286331153_j";

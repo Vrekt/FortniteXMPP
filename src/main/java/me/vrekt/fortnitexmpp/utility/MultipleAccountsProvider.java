@@ -60,7 +60,7 @@ public final class MultipleAccountsProvider {
      * @return a new {@link FortniteXmpp} instance if connected successfully
      */
     public FortniteXmpp connectOne(String id, AppType appType, PlatformType platformType) {
-        var provider = temporaryAccountProviders.stream().filter(p -> p.id.equals(id)).findFirst().orElse(null);
+        final var provider = temporaryAccountProviders.stream().filter(p -> p.id.equals(id)).findFirst().orElse(null);
         if (provider == null) throw new IllegalArgumentException("ID not found!");
         return connectOrThrow(provider, appType, platformType);
     }
@@ -76,7 +76,7 @@ public final class MultipleAccountsProvider {
     private FortniteXmpp connectOrThrow(TemporaryAccountProvider provider, AppType appType, PlatformType platformType) {
         try {
             System.out.println("Connecting account: " + provider.id);
-            var service = FortniteXmpp.newBuilder(provider.build()).setApplication(appType).setPlatform(platformType).build();
+            final var service = FortniteXmpp.newBuilder(provider.build()).setApplication(appType).setPlatform(platformType).build();
             service.connect();
 
             System.out.println(service.getAccountId() + ":" + service.getDisplayName() + " has connected!");

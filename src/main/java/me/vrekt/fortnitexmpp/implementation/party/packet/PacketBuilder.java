@@ -19,7 +19,7 @@ public final class PacketBuilder {
      */
     public static JsonObject buildPacket(JsonObject payload, PartyPacketType type) {
         REVS.put(type, REVS.getOrDefault(type, 0) + 1);
-        var object = Json.createObjectBuilder();
+        final var object = Json.createObjectBuilder();
         object.add("type", type.getName());
         object.add("payload", payload);
         object.add("timestamp", LocalDateTime.now().toString());
@@ -37,7 +37,7 @@ public final class PacketBuilder {
      */
     public static JsonObject buildPacketDoublePayload(String partyId, JsonObject payload, PartyPacketType type) {
         REVS.put(type, REVS.getOrDefault(type, 0) + 1);
-        var object = Json.createObjectBuilder();
+        final var object = Json.createObjectBuilder();
         object.add("type", type.getName());
         object.add("payload", Json.createObjectBuilder().add("partyId", partyId).add("payload", payload).build());
         object.add("timestamp", LocalDateTime.now().toString());

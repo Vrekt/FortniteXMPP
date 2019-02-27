@@ -82,7 +82,7 @@ public final class DefaultPartyService implements PartyService {
     @Override
     public void sendPacketToAll(PartyPacket partyPacket, Collection<PartyMember> members) {
         try {
-            for (PartyMember member : members) {
+            for (var member : members) {
                 if (member.getJid().equals(fortniteXmpp.getJid())) continue;
                 connection.sendStanza(new Message(member.getJid(), partyPacket.getPayload()));
             }
@@ -124,23 +124,23 @@ public final class DefaultPartyService implements PartyService {
         @Override
         public void processStanza(Stanza packet) {
             if (!(packet instanceof Message)) return;
-            var message = (Message) packet;
+            final var message = (Message) packet;
             if (message.getType() != Message.Type.normal) return;
 
             listeners.forEach(listener -> listener.onMessageReceived(message));
 
             try {
-                var reader = Json.createReader(new StringReader(message.getBody()));
+                final var reader = Json.createReader(new StringReader(message.getBody()));
                 var data = reader.readObject();
                 reader.close();
 
-                var payload = data.getJsonObject("payload");
-                var type = data.getString("type");
-                var packetType = PartyPacketType.getFrom(type);
+                final var payload = data.getJsonObject("payload");
+                final var type = data.getString("type");
+                final var packetType = PartyPacketType.getFrom(type);
                 if (packetType == PartyPacketType.PARTY_UNKNOWN_TYPE) return;
 
-                var party = Party.newBuilder(payload, message.getFrom()).build();
-                var updated = updateParty(party);
+                final var party = Party.newBuilder(payload, message.getFrom()).build();
+                final var updated = updateParty(party);
 
                 postPartyEvent(packetType, updated, payload, message.getFrom());
             } catch (Exception exception) {

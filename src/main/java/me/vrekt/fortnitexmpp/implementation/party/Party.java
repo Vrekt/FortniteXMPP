@@ -97,13 +97,13 @@ public class Party {
     public void sendPrivacyConfigurationTo(PartyService service, Jid to) {
         if (configuration == null) return;
 
-        var configurationPacket = new PacketPartyConfiguration(this, configuration);
-        var dataBuilder = PartyData.newBuilder(PartyDataType.PRIVACY_SETTINGS)
+        final var configurationPacket = new PacketPartyConfiguration(this, configuration);
+        final var dataBuilder = PartyData.newBuilder(PartyDataType.PRIVACY_SETTINGS)
                 .setPartyType(configuration.getPrivacyType().getName())
                 .setPartyInviteRestriction(configuration.allowFriendsOfFriends() ? "AnyMember" : "LeaderOnly")
                 .setOnlyLeaderFriendsCanJoin(!configuration.allowFriendsOfFriends());
 
-        var dataPacket = new PacketPartyData(this, dataBuilder.build());
+        final var dataPacket = new PacketPartyData(this, dataBuilder.build());
         service.sendPacketTo(configurationPacket, to);
         service.sendPacketTo(dataPacket, to);
     }
