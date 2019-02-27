@@ -15,10 +15,10 @@ Check out the wiki [here](https://github.com/Vrekt/FortniteXMPP2/wiki)
 Need more help? Add me on discord: vrekt#4387
 
 # Features
-  - Mostly complete party support
-  - Presence support
-  - Friend support, (events for friend stuff)
-  - Chat support, (send messages to members)
+  - Complete party support.
+  - Complete presence support with convenience methods for session, playing, etc.
+  - Events for the friend system, (friend request, deleted, rejected, etc.)
+  - Chat support - listeners for incoming messages and reply methods
 
 # Disclaimer
 I am not responsible for any trouble you get into while using this library. I suggest you do not abuse the party system and the XMPP system in general.
