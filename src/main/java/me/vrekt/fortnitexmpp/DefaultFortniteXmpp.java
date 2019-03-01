@@ -80,6 +80,7 @@ public final class DefaultFortniteXmpp implements FortniteXmpp {
         presenceService.close();
         friendService.close();
         chatService.close();
+        fortnite.close();
 
         PingManager.getInstanceFor(connection).setPingInterval(-1);
         connection.disconnect();

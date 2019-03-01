@@ -136,6 +136,8 @@ public final class DefaultPartyService implements PartyService {
 
                 final var payload = data.getJsonObject("payload");
                 final var type = data.getString("type");
+                System.err.println("TYPE: " + type + "\nPAYLOAD: " + payload);
+
                 final var packetType = PartyPacketType.getFrom(type);
                 if (packetType == PartyPacketType.PARTY_UNKNOWN_TYPE) return;
 

@@ -19,12 +19,7 @@ import java.util.Set;
 
 public class Party {
 
-    // TODO: Update build ID without having to change source
-    // TODO: Build ID is changed every major Fortnite update.
-    // TODO: It seems minor updates, like small client updates or performance patches do not affect build ID.
-    // TODO: CURRENT 7.4
-    // TODO: NEXT CHANGE = SEASON 8 (2-3 days) // 2/25/18
-    public static final String DEFAULT_BUILD_ID = "4774386";
+    public static final String DEFAULT_BUILD_ID = "4918548";
 
     private final String id, accessKey;
     private final Jid from;
