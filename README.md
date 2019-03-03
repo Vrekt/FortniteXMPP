@@ -22,3 +22,15 @@ Need more help? Add me on discord: vrekt#4387
 
 # Disclaimer
 I am not responsible for any trouble you get into while using this library. I suggest you do not abuse the party system and the XMPP system in general.
+
+# Quick Start
+
+Start by connecting/logging in: [here](https://github.com/Vrekt/FortniteXMPP2/wiki/Initialization-and-connecting-to-the-XMPP-service.)
+
+If you want to collect session IDs, (match id), how many players are in a server, etc use [this](https://github.com/Vrekt/FortniteXMPP2/wiki/Presences)
+
+If you want to use party related stuff, use [this](https://github.com/Vrekt/FortniteXMPP2/wiki/Parties)
+
+If you want to use multiple bot accounts use [this](https://github.com/Vrekt/FortniteXMPP2/wiki/Using-the-Multiple-Accounts-Provider)
+
+If you want to chat with other players use [this](https://github.com/Vrekt/FortniteXMPP2/wiki/Chatting)
