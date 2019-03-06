@@ -19,7 +19,7 @@ import java.util.Set;
 
 public class Party {
 
-    public static final String DEFAULT_BUILD_ID = "4918548";
+    public static final String DEFAULT_BUILD_ID = "5209636";
 
     private final String id, accessKey;
     private final Jid from;
@@ -118,7 +118,7 @@ public class Party {
      * @param service the service
      * @param members a list of members in the party
      */
-    public void sendPrivacyConfiguratioToAll(PartyService service, Collection<PartyMember> members) {
+    public void sendPrivacyConfigurationToAll(PartyService service, Collection<PartyMember> members) {
         members.forEach(member -> sendPrivacyConfigurationTo(service, member.getJid()));
     }
 
