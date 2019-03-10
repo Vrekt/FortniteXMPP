@@ -6,12 +6,12 @@ import me.vrekt.fortnitexmpp.implementation.party.event.invite.PartyInvitationEv
 import me.vrekt.fortnitexmpp.implementation.party.event.invite.PartyInvitationResponseEvent;
 import me.vrekt.fortnitexmpp.implementation.party.event.join.PartyJoinRequestApprovedEvent;
 import me.vrekt.fortnitexmpp.implementation.party.event.join.PartyJoinRequestEvent;
+import me.vrekt.fortnitexmpp.implementation.party.event.join.PartyQueryJoinabilityEvent;
 import me.vrekt.fortnitexmpp.implementation.party.event.join.PartyQueryJoinabilityResponseEvent;
 import me.vrekt.fortnitexmpp.implementation.party.event.member.PartyMemberExitedEvent;
 import me.vrekt.fortnitexmpp.implementation.party.event.member.PartyMemberJoinedEvent;
 import me.vrekt.fortnitexmpp.implementation.party.event.member.PartyMemberPromotedEvent;
-import me.vrekt.fortnitexmpp.implementation.party.event.join.PartyQueryJoinabilityEvent;
-import me.vrekt.fortnitexmpp.implementation.party.member.data.PartyMemberData;
+import me.vrekt.fortnitexmpp.implementation.party.member.data.OtherPartyMemberData;
 import org.jivesoftware.smack.packet.Message;
 import org.jxmpp.jid.Jid;
 
@@ -105,7 +105,7 @@ public interface PartyListener {
      * @param data  the data.
      * @param from  who it was sent from
      */
-    default void onPartyMemberData(Party party, PartyMemberData data, Jid from) {
+    default void onPartyMemberData(Party party, OtherPartyMemberData data, Jid from) {
 
     }
 

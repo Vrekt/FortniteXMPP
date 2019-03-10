@@ -18,7 +18,7 @@ public final class PartyDataEvent {
     private final Jid from;
     private final String payload;
 
-    private String customMatchKey, playlistName, tournamentId, eventWindowId, sessionId, sessionKey, partyInviteRestriction;
+    private String customMatchKey, playlistName, tournamentId, eventWindowId, regionId, sessionId, sessionKey, partyInviteRestriction;
     private PrivacyType type;
     private boolean allowJoinInProgress, squadFill, partyIsJoinedInProgress, onlyLeaderFriendsCanJoin;
 
@@ -37,6 +37,7 @@ public final class PartyDataEvent {
             JsonUtility.getString("playlistName", playlistData).ifPresent(playlistName -> this.playlistName = playlistName);
             JsonUtility.getString("tournamentId", playlistData).ifPresent(tournamentId -> this.tournamentId = tournamentId);
             JsonUtility.getString("eventWindowId", playlistData).ifPresent(eventWindowId -> this.eventWindowId = eventWindowId);
+            JsonUtility.getString("regionId", playlistData).ifPresent(regionId -> this.regionId = regionId);
         });
 
         JsonUtility.getBoolean("AllowJoinInProgress_b", data).ifPresent(allowJoinInProgress -> this.allowJoinInProgress = allowJoinInProgress);
@@ -82,6 +83,10 @@ public final class PartyDataEvent {
 
     public String getEventWindowId() {
         return eventWindowId;
+    }
+
+    public String getRegionId() {
+        return regionId;
     }
 
     public String getSessionId() {

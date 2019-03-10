@@ -18,8 +18,6 @@ public final class PartyMemberData {
     private PartyMemberData(Builder builder) {
         if (builder.type == MemberDataBuildType.MEMBER) {
             initializeMember(builder);
-        } else if (builder.type == MemberDataBuildType.OTHER_MEMBER) {
-            initializeOtherMember(builder);
         } else if (builder.type == MemberDataBuildType.SKIN) {
             initializeSkinChange(builder);
         } else if (builder.type == MemberDataBuildType.BACKBLING) {
@@ -83,15 +81,6 @@ public final class PartyMemberData {
         payload.add("Rev", PacketBuilder.getRevForType(PartyPacketType.PARTY_MEMBER_DATA));
         payload.add("Attrs", attributes.build());
         this.payload = payload.build();
-    }
-
-    /**
-     * Copies the payload from another member
-     *
-     * @param builder the builder
-     */
-    private void initializeOtherMember(Builder builder) {
-        this.payload = builder.payload;
     }
 
     /**

@@ -29,6 +29,11 @@ public final class JsonUtility {
         return object.containsKey(name) ? Optional.ofNullable(object.getJsonObject(name)) : Optional.empty();
     }
 
+    public static Optional<JsonObject> getObject(String name, String name2, JsonObject object) {
+        if (name == null || name2 == null || object == null) return Optional.empty();
+        return object.containsKey(name) ? getObject(name2, object.getJsonObject(name)) : Optional.empty();
+    }
+
     public static Optional<JsonArray> getArray(String name, JsonObject object) {
         if (name == null || object == null) return Optional.empty();
         return object.containsKey(name) ? Optional.ofNullable(object.getJsonArray(name)) : Optional.empty();
