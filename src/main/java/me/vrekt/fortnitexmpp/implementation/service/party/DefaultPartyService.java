@@ -15,7 +15,9 @@ import me.vrekt.fortnitexmpp.implementation.party.event.member.PartyMemberExited
 import me.vrekt.fortnitexmpp.implementation.party.event.member.PartyMemberJoinedEvent;
 import me.vrekt.fortnitexmpp.implementation.party.event.member.PartyMemberPromotedEvent;
 import me.vrekt.fortnitexmpp.implementation.party.member.PartyMember;
-import me.vrekt.fortnitexmpp.implementation.party.member.data.OtherPartyMemberData;
+import me.vrekt.fortnitexmpp.implementation.party.member.data.MemberDataBuildType;
+import me.vrekt.fortnitexmpp.implementation.party.member.data.PartyMemberDataAttributes;
+import me.vrekt.fortnitexmpp.implementation.party.member.data.PartyMemberData;
 import me.vrekt.fortnitexmpp.implementation.party.packet.PartyPacket;
 import me.vrekt.fortnitexmpp.implementation.party.packet.PartyPacketType;
 import org.jivesoftware.smack.SmackException;
@@ -52,7 +54,6 @@ public final class DefaultPartyService implements PartyService {
     @Override
     public void addPartyListener(PartyListener listener) {
         listeners.add(listener);
-
     }
 
     @Override
@@ -186,7 +187,8 @@ public final class DefaultPartyService implements PartyService {
                 listeners.forEach(listener -> listener.onPartyQueryJoinabilityResponse(partyQueryJoinabilityResponseEvent));
                 break;
             case PARTY_MEMBER_DATA:
-                listeners.forEach(listener -> listener.onPartyMemberData(party, new OtherPartyMemberData(payload), from));
+                listeners.forEach(listener -> listener.onPartyMemberData(party, PartyMemberData.newBuilder(MemberDataBuildType.PAYLOAD).setPayload(payload).build(),
+                        new PartyMemberDataAttributes(payload), from));
                 break;
             case PARTY_MEMBER_PROMOTED:
                 final var partyMemberPromotedEvent = new PartyMemberPromotedEvent(party, payload, from);

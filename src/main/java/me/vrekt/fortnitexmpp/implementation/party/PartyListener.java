@@ -11,7 +11,8 @@ import me.vrekt.fortnitexmpp.implementation.party.event.join.PartyQueryJoinabili
 import me.vrekt.fortnitexmpp.implementation.party.event.member.PartyMemberExitedEvent;
 import me.vrekt.fortnitexmpp.implementation.party.event.member.PartyMemberJoinedEvent;
 import me.vrekt.fortnitexmpp.implementation.party.event.member.PartyMemberPromotedEvent;
-import me.vrekt.fortnitexmpp.implementation.party.member.data.OtherPartyMemberData;
+import me.vrekt.fortnitexmpp.implementation.party.member.data.PartyMemberDataAttributes;
+import me.vrekt.fortnitexmpp.implementation.party.member.data.PartyMemberData;
 import org.jivesoftware.smack.packet.Message;
 import org.jxmpp.jid.Jid;
 
@@ -98,14 +99,16 @@ public interface PartyListener {
 
     }
 
+
     /**
      * Invoked when party member data is received.
      *
-     * @param party the party
-     * @param data  the data.
-     * @param from  who it was sent from
+     * @param party       the party
+     * @param payloadData the {@link PartyMemberData} that was built with a payload.
+     * @param data        the data.
+     * @param from        who it was sent from
      */
-    default void onPartyMemberData(Party party, OtherPartyMemberData data, Jid from) {
+    default void onPartyMemberData(Party party, PartyMemberData payloadData, PartyMemberDataAttributes data, Jid from) {
 
     }
 

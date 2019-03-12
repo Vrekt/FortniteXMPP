@@ -28,6 +28,8 @@ public final class PartyMemberData {
             initializePreload(builder);
         } else if (builder.type == MemberDataBuildType.PLAYERS_LEFT) {
             initializePlayersLeft(builder);
+        } else if (builder.type == MemberDataBuildType.PAYLOAD) {
+            initializePayload(builder);
         }
     }
 
@@ -195,6 +197,16 @@ public final class PartyMemberData {
         payload.add("Attrs", attributes.build());
         this.payload = payload.build();
     }
+
+    /**
+     * Initialize with the payload
+     *
+     * @param builder the builder
+     */
+    private void initializePayload(Builder builder) {
+        this.payload = builder.payload;
+    }
+
 
     public JsonObject getPayload() {
         return payload;

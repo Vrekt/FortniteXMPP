@@ -327,6 +327,12 @@ public enum Skin {
     CID_342_Athena_Commando_M_StreetRacerMetallic,
     CID_343_Athena_Commando_M_CupidDark,
     CID_344_Athena_Commando_M_IceCream,
-    CID_345_Athena_Commando_M_LoveLlama;
+    CID_345_Athena_Commando_M_LoveLlama,
+    CID_361_Athena_Commando_M_BandageNinja,
+    CID_362_Athena_Commando_F_BandageNinja,
+    CID_367_Athena_Commando_F_Tropical,
+    CID_366_Athena_Commando_M_Tropical,
+    CID_364_Athena_Commando_F_SciOps,
+    CID_363_Athena_Commando_M_SciOps
 
 }
