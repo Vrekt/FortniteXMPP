@@ -19,7 +19,7 @@ import java.util.Set;
 
 public class Party {
 
-    public static final String DEFAULT_BUILD_ID = "5087669";
+    public static final String DEFAULT_BUILD_ID = "5361687";
 
     private final String id, accessKey;
     private final Jid from;
