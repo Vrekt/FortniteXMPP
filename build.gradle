@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+}
+
+group 'me.vrekt'
+version '2.0'
+
+sourceCompatibility = 11
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'io.github.robertograham', name: 'fortnite-2', version: '3.1.0'
+    compile group: 'org.igniterealtime.smack', name: 'smack-tcp', version: '4.3.3'
+    compile group: 'org.igniterealtime.smack', name: 'smack-extensions', version: '4.3.3'
+    compile group: 'org.igniterealtime.smack', name: 'smack-java7', version: '4.3.3'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.8.1'
+    compile group: 'com.google.flogger', name: 'flogger', version: '0.4'
+    runtime group: 'com.google.flogger', name: 'flogger-system-backend', version: '0.4'
+    compile group: 'javax.json', name: 'javax.json-api', version: '1.1.4'
+}
