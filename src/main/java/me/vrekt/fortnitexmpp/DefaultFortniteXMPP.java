@@ -127,6 +127,7 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
         fortnite.close();
         chatResource.close();
         friendResource.close();
+        partyResource.close();
         connection.disconnect();
     }
 
