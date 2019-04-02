@@ -10,6 +10,7 @@ import java.util.List;
 public interface Party {
 
     int TYPE_ID = 286331153;
+    String PARTY_DATA_INFO = "party.joininfodata." + TYPE_ID + "_j";
 
     /**
      * Static factory method for creating a new {@link Party} with the provided configuration.

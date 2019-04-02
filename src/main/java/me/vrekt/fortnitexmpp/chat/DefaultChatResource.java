@@ -7,7 +7,6 @@ import org.jivesoftware.smack.chat2.Chat;
 import org.jivesoftware.smack.chat2.ChatManager;
 import org.jivesoftware.smack.chat2.IncomingChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.impl.JidCreate;
 
@@ -23,10 +22,10 @@ public final class DefaultChatResource implements ChatResource {
     /**
      * Initialize this resource.
      *
-     * @param connection the connection
+     * @param fortniteXMPP the instance of {@link FortniteXMPP}
      */
-    public DefaultChatResource(final XMPPTCPConnection connection) {
-        chatManager = ChatManager.getInstanceFor(connection);
+    public DefaultChatResource(final FortniteXMPP fortniteXMPP) {
+        chatManager = ChatManager.getInstanceFor(fortniteXMPP.connection());
         chatManager.addIncomingListener(messageListener);
     }
 

@@ -6,6 +6,7 @@ import me.vrekt.fortnitexmpp.exception.FortniteAuthenticationException;
 import me.vrekt.fortnitexmpp.exception.XMPPAuthenticationException;
 import me.vrekt.fortnitexmpp.friend.FriendResource;
 import me.vrekt.fortnitexmpp.party.PartyResource;
+import me.vrekt.fortnitexmpp.presence.PresenceResource;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jxmpp.jid.EntityFullJid;
 
@@ -102,6 +103,11 @@ public interface FortniteXMPP {
      * @return the internal {@link PartyResource} instance used for party related actions.
      */
     PartyResource party();
+
+    /**
+     * @return the internal {@link PresenceResource} instance used for presence related actions.
+     */
+    PresenceResource presence();
 
     enum AppType {
         FORTNITE("Fortnite"), LAUNCHER("launcher");
