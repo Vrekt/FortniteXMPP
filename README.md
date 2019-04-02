@@ -19,3 +19,6 @@ As always, if you need further help or have any questions please contact me on d
 
 # Disclaimer
 I am not responsible for any trouble you get into while using this library. I suggest you do not abuse the party system and the XMPP system in general.
+
+# Issues or Features
+Please submit an issue if you want to request a feature.
