@@ -1,7 +1,8 @@
 package me.vrekt.fortnitexmpp.party.implementation.error;
 
 /**
- * Rejection types.
+ * Rejection types used by the Fortnite client.
+ * OTHER is currently unknown, could be related to build id.
  */
 public enum RejectionType {
 

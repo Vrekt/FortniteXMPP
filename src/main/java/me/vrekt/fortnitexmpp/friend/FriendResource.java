@@ -23,6 +23,6 @@ public interface FriendResource extends AutoCloseable {
      *
      * @param accountId the account ID.
      */
-    void acceptFriendRequest(final String accountId);
+    boolean acceptOrSendFriendRequest(final String accountId);
 
 }

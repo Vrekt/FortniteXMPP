@@ -17,6 +17,7 @@ public enum FriendType {
     }
 
     public static FriendType typeOf(String otherType) {
+        if(otherType == null) return null;
         return TYPES.stream().filter(t -> t.getName().equals(otherType)).findAny().orElse(null);
     }
 

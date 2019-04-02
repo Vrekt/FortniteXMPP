@@ -55,7 +55,7 @@ public interface FortniteXMPP {
      *
      * @param callback the callback
      */
-    void connectAsync(Consumer<Boolean> callback);
+    void connectAsync(final Consumer<Boolean> callback);
 
     /**
      * Disconnects from the XMPP service and disposes of everything created.
@@ -63,6 +63,13 @@ public interface FortniteXMPP {
      * with packets next time you connect.
      */
     void disconnect();
+
+    /**
+     * If {@code log} is {@code true} then all exceptions/warnings will be logged.
+     *
+     * @param log if logging should be enabled.
+     */
+    void logExceptionsAndWarnings(final boolean log);
 
     /**
      * @return the {@link Fortnite} instance created or provided.
@@ -109,6 +116,9 @@ public interface FortniteXMPP {
      */
     PresenceResource presence();
 
+    /**
+     * Valid types for the XMPP service.
+     */
     enum AppType {
         FORTNITE("Fortnite"), LAUNCHER("launcher");
 
@@ -123,6 +133,9 @@ public interface FortniteXMPP {
         }
     }
 
+    /**
+     * Valid platforms Fortnite can be played on.
+     */
     enum PlatformType {
         WIN, MAC, IOS, AND, PSN, XBL, SWT
     }

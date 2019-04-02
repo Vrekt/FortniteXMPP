@@ -40,7 +40,13 @@ public final class DefaultPartyResource implements PartyResource {
     private final XMPPTCPConnection connection;
 
     private Party partyContext;
+    private boolean log;
 
+    /**
+     * Initialize this resource
+     *
+     * @param fortniteXMPP the {@link FortniteXMPP} instance
+     */
     public DefaultPartyResource(final FortniteXMPP fortniteXMPP) {
         this.connection = fortniteXMPP.connection();
         connection.addAsyncStanzaListener(messageListener, StanzaTypeFilter.MESSAGE);
@@ -83,6 +89,7 @@ public final class DefaultPartyResource implements PartyResource {
             message.setBody(request.payload());
             connection.sendStanza(message);
         } catch (final SmackException.NotConnectedException | InterruptedException exception) {
+            // TODO: Ignore log variable here. Maybe change later.
             LOGGER.atSevere().log("Could not send party request!");
         }
     }
@@ -97,8 +104,13 @@ public final class DefaultPartyResource implements PartyResource {
         connection.removeAsyncStanzaListener(messageListener);
         listeners.clear();
         partyContext = null;
+    }
 
-        LOGGER.atInfo().log("Closed PartyResource successfully.");
+    /**
+     * @param log {@code true} if this resource should log exceptions and warnings.
+     */
+    public void logExceptionsAndWarnings(final boolean log) {
+        this.log = log;
     }
 
     /**
@@ -115,6 +127,7 @@ public final class DefaultPartyResource implements PartyResource {
                 final var data = reader.readObject();
                 reader.close();
 
+                // TODO: Move this down later? This will print messages from other stuff like friends, etc.
                 listeners.forEach(listener -> listener.onMessageReceived(message));
 
                 final var payload = data.getJsonObject("payload");
@@ -147,8 +160,7 @@ public final class DefaultPartyResource implements PartyResource {
                 updatePartyBasedOnType(partyContext, type, payload, message.getFrom());
                 invokeListeners(partyContext, type, payload, message.getFrom());
             } catch (final Exception exception) {
-                exception.printStackTrace();
-                LOGGER.atWarning().log("Failed to parse message party JSON.");
+                if (log) LOGGER.atWarning().log("Failed to parse message party JSON.");
             }
         }
     }
@@ -165,24 +177,23 @@ public final class DefaultPartyResource implements PartyResource {
 
         // join request has data about party members already in the party.
         if (type == PartyType.PARTY_JOIN_REQUEST_APPROVED) {
-
             JsonUtility.getArray("members", payload).ifPresentOrElse(array -> array.forEach(value -> {
                 final var object = value.asJsonObject();
                 party.addMember(PartyMember.newMember(object));
-            }), () -> LOGGER.atWarning().log("Invalid join request data received from: " + from.asUnescapedString()));
+            }), () -> logMalformedType(type, payload, from));
             // a member joined, verify the request is valid.
         } else if (type == PartyType.PARTY_MEMBER_JOINED) {
             JsonUtility.getObject("member", payload)
-                    .ifPresentOrElse(object -> party.addMember(PartyMember.newMember(object)), () -> LOGGER.atWarning().log("Invalid member joined received from: " + from
-                            .asUnescapedString()));
+                    .ifPresentOrElse(object -> party.addMember(PartyMember.newMember(object)), () -> logMalformedType(type, payload, from));
             // a member exited
         } else if (type == PartyType.PARTY_MEMBER_EXITED) {
             final var memberId = JsonUtility.getString("memberId", payload);
             final var kicked = JsonUtility.getBoolean("wasKicked", payload);
             if (memberId.isEmpty() || kicked.isEmpty()) {
-                LOGGER.atWarning().log("Invalid party member exited data received from: " + from.asUnescapedString());
+                logMalformedType(type, payload, from);
                 return;
             }
+
             party.removeMemberById(memberId.get());
             // party data was received
         } else if (type == PartyType.PARTY_DATA) {
@@ -192,9 +203,7 @@ public final class DefaultPartyResource implements PartyResource {
             final var privacySettings = JsonUtility.getObject("PrivacySettings", privacySettings_j.orElse(null));
 
             // TODO: Implement new squad assignment data, just return for now since there is no useful data here.
-            if (innerPayload.isEmpty() || attributes.isEmpty() || privacySettings_j.isEmpty() || privacySettings.isEmpty()) {
-                return;
-            }
+            if (innerPayload.isEmpty() || attributes.isEmpty() || privacySettings_j.isEmpty() || privacySettings.isEmpty()) return;
 
             // reverse this, because the original value is called "onlyLeaderFriendsCanJoin"
             final var allowFriendsOfFriends = !JsonUtility.getBoolean("bOnlyLeaderFriendsCanJoin", privacySettings.get()).orElse(false);
@@ -220,7 +229,7 @@ public final class DefaultPartyResource implements PartyResource {
             final var notAcceptingMembersReason = JsonUtility.getInt("notAcceptingMembersReason", payload);
             final var maxMembers = JsonUtility.getInt("maxMembers", payload);
             if (presencePermissions.isEmpty() || invitePermissions.isEmpty() || partyFlags.isEmpty() || notAcceptingMembersReason.isEmpty() || maxMembers.isEmpty()) {
-                LOGGER.atWarning().log("Invalid party configuration data received from: " + from.asUnescapedString());
+                logMalformedType(type, payload, from);
                 return;
             }
 
@@ -243,7 +252,7 @@ public final class DefaultPartyResource implements PartyResource {
         } else if (type == PartyType.PARTY_INVITATION_RESPONSE) {
             final var response = JsonUtility.getInt("response", payload);
             if (response.isEmpty()) {
-                LOGGER.atWarning().log("Invalid invitation response received from: " + from.asUnescapedString());
+                logMalformedType(type, payload, from);
                 return;
             }
 
@@ -254,7 +263,7 @@ public final class DefaultPartyResource implements PartyResource {
             final var attributes = JsonUtility.getObject("Attrs", joinData.orElse(null));
             final var crossplayPreference = JsonUtility.getInt("CrossplayPreference_i", attributes.orElse(null));
             if (joinData.isEmpty() || attributes.isEmpty() || crossplayPreference.isEmpty()) {
-                LOGGER.atWarning().log("Invalid query joinability request received from: " + from.asUnescapedString());
+                logMalformedType(type, payload, from);
                 return;
             }
             listeners.forEach(listener -> listener.onQueryJoinability(party, crossplayPreference.get(), from));
@@ -264,7 +273,7 @@ public final class DefaultPartyResource implements PartyResource {
             final var rejectionType = JsonUtility.getInt("rejectionType", payload);
             final var resultParam = JsonUtility.getString("resultParam", payload);
             if (isJoinable.isEmpty() || rejectionType.isEmpty() || resultParam.isEmpty()) {
-                LOGGER.atWarning().log("Invalid query joinability response received from: " + from.asUnescapedString());
+                logMalformedType(type, payload, from);
                 return;
             }
             listeners.forEach(listener -> listener.onQueryJoinabilityResponse(party, isJoinable.get(), rejectionType.get(), resultParam.get(), from));
@@ -273,13 +282,16 @@ public final class DefaultPartyResource implements PartyResource {
             final var accountId = from.getLocalpartOrNull();
             final var resource = from.getResourceOrNull();
             if (accountId == null || resource == null) {
-                LOGGER.atWarning().log("Invalid join request received from: " + from.asUnescapedString());
+                logMalformedType(type, payload, from);
                 return;
             }
-            JsonUtility.getString("displayName", payload).ifPresent(displayName -> {
-                listeners.forEach(listener -> listener.onJoinRequest(party, PartyMember
-                        .newMember(accountId.asUnescapedString(), resource.toString(), displayName, FindPlatformUtility.getPlatformForResource(resource.toString())), from));
-            });
+
+            // YIKES formatting
+            JsonUtility.getString("displayName", payload)
+                    .ifPresent(displayName -> listeners
+                            .forEach(listener -> listener.onJoinRequest(party, PartyMember
+                                    .newMember(accountId.asUnescapedString(), resource.toString(), displayName,
+                                            FindPlatformUtility.getPlatformForResource(resource.toString())), from)));
             // request rejected
         } else if (type == PartyType.PARTY_JOIN_REQUEST_REJECTED) {
             listeners.forEach(listener -> listener.onJoinRequestRejected(party, from));
@@ -287,7 +299,7 @@ public final class DefaultPartyResource implements PartyResource {
         } else if (type == PartyType.PARTY_JOIN_REQUEST_APPROVED) {
             final var members = JsonUtility.getArray("members", payload);
             if (members.isEmpty()) {
-                LOGGER.atWarning().log("Malformed %s type received from: " + from.asUnescapedString(), PartyType.PARTY_JOIN_REQUEST_APPROVED);
+                logMalformedType(type, payload, from);
                 return;
             }
             final var array = members.get();
@@ -312,7 +324,7 @@ public final class DefaultPartyResource implements PartyResource {
             final var accountId = JsonUtility.getString("memberId", payload);
             final var wasKicked = JsonUtility.getBoolean("wasKicked", payload);
             if (accountId.isEmpty() || wasKicked.isEmpty()) {
-                LOGGER.atWarning().log("Invalid party member exited request received from: " + from.asUnescapedString());
+                logMalformedType(type, payload, from);
                 return;
             }
             listeners.forEach(listener -> listener.onPartyMemberExited(party, accountId.get(), wasKicked.get(), from));
@@ -321,7 +333,7 @@ public final class DefaultPartyResource implements PartyResource {
             final var accountId = JsonUtility.getString("promotedMemberUserId", payload);
             final var wasFromLeaderLeaving = JsonUtility.getBoolean("fromLeaderLeaving", payload);
             if (accountId.isEmpty() || wasFromLeaderLeaving.isEmpty()) {
-                LOGGER.atWarning().log("Invalid party member promoted request received from: " + from.asUnescapedString());
+                logMalformedType(type, payload, from);
                 return;
             }
             listeners.forEach(listener -> listener.onPartyMemberPromoted(party, accountId.get(), wasFromLeaderLeaving.get(), from));
@@ -333,7 +345,7 @@ public final class DefaultPartyResource implements PartyResource {
             final var notAcceptingMembersReason = JsonUtility.getInt("notAcceptingMembersReason", payload);
             final var maxMembers = JsonUtility.getInt("maxMembers", payload);
             if (presencePermissions.isEmpty() || invitePermissions.isEmpty() || partyFlags.isEmpty() || notAcceptingMembersReason.isEmpty() || maxMembers.isEmpty()) {
-                LOGGER.atWarning().log("Invalid party configuration request received from: " + from.asUnescapedString());
+                logMalformedType(type, payload, from);
                 return;
             }
             listeners.forEach(listener -> listener.onPartyConfigurationUpdated(party,
@@ -342,10 +354,23 @@ public final class DefaultPartyResource implements PartyResource {
         } else if (type == PartyType.PARTY_DATA) {
             final var data = ImmutablePartyData.adaptFrom(payload);
             if (data == null) {
-                LOGGER.atWarning().log("Invalid party data received from: " + from.asUnescapedString());
+                logMalformedType(type, payload, from);
                 return;
             }
             listeners.forEach(listener -> listener.onPartyData(party, data, from));
         }
     }
+
+    /**
+     * Log the malformed type received
+     *
+     * @param type    the type
+     * @param payload the payload sent
+     * @param from    who it was sent from
+     */
+    private void logMalformedType(final PartyType type, final JsonObject payload, final Jid from) {
+        if (log)
+            LOGGER.atWarning().log("Invalid party message received from: " + from.asUnescapedString() + "\nType: " + type.getName() + "\nPayload as string: " + payload.toString());
+    }
+
 }

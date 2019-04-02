@@ -140,6 +140,12 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
     }
 
     @Override
+    public void logExceptionsAndWarnings(final boolean log) {
+        partyResource.logExceptionsAndWarnings(log);
+        friendResource.logExceptionsAndWarnings(log);
+    }
+
+    @Override
     public Fortnite fortnite() {
         return fortnite;
     }

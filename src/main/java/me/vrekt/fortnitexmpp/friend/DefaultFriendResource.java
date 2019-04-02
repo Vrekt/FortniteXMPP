@@ -25,6 +25,13 @@ public final class DefaultFriendResource implements FriendResource {
     private final XMPPTCPConnection connection;
     private final FortniteXMPP fortniteXMPP;
 
+    private boolean log;
+
+    /**
+     * Initialize this resource
+     *
+     * @param fortniteXMPP the {@link FortniteXMPP} instance
+     */
     public DefaultFriendResource(final FortniteXMPP fortniteXMPP) {
         this.connection = fortniteXMPP.connection();
         this.fortniteXMPP = fortniteXMPP;
@@ -42,20 +49,27 @@ public final class DefaultFriendResource implements FriendResource {
     }
 
     @Override
-    public void acceptFriendRequest(final String accountId) {
+    public boolean acceptOrSendFriendRequest(final String accountId) {
         try {
             fortniteXMPP.fortnite().friend().addOneByAccountId(accountId);
         } catch (final IOException exception) {
-            LOGGER.atWarning().log("Could not accept the friend request from: " + accountId);
+            if (log) LOGGER.atWarning().log("Could not accept the friend request from: " + accountId);
+            return false;
         }
+        return true;
     }
 
     @Override
     public void close() {
         connection.removeAsyncStanzaListener(messageListener);
         listeners.clear();
+    }
 
-        LOGGER.atInfo().log("Closed FriendResource successfully.");
+    /**
+     * @param log {@code true} if this resource should log exceptions and warnings.
+     */
+    public void logExceptionsAndWarnings(final boolean log) {
+        this.log = log;
     }
 
     /**
@@ -72,7 +86,7 @@ public final class DefaultFriendResource implements FriendResource {
                 final var data = reader.readObject();
                 reader.close();
 
-                final var type = FriendType.typeOf(JsonUtility.getString("type", data).orElse("E"));
+                final var type = FriendType.typeOf(JsonUtility.getString("type", data).orElse(null));
                 if (type == null) return; // not relevant
 
                 listeners.forEach(listener -> listener.onXMPPFriendMessage(message));
@@ -115,7 +129,7 @@ public final class DefaultFriendResource implements FriendResource {
                 }
 
             } catch (final Exception exception) {
-                LOGGER.atWarning().log("Failed to parse message JSON.");
+                if (log) LOGGER.atWarning().log("Failed to parse message JSON.");
             }
         }
     }

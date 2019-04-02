@@ -44,7 +44,6 @@ public final class DefaultFortnitePresence implements FortnitePresence {
             });
 
         } catch (final Exception exception) {
-          //  LOGGER.atWarning().log("Exception caught trying to parse presence from: " + accountId + "\nJid:" + from.asUnescapedString() + "\nStatus: " + status);
             isValid = false;
         }
 

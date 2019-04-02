@@ -25,6 +25,11 @@ public final class DefaultPresenceResource implements PresenceResource {
 
     private boolean onlyHandleAvailablePresences;
 
+    /**
+     * Initialize this resource
+     *
+     * @param fortniteXMPP the {@link FortniteXMPP} instance
+     */
     public DefaultPresenceResource(final FortniteXMPP fortniteXMPP) {
         this.connection = fortniteXMPP.connection();
         this.roster = Roster.getInstanceFor(connection);

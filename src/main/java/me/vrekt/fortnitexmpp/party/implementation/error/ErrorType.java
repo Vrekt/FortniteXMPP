@@ -1,7 +1,8 @@
 package me.vrekt.fortnitexmpp.party.implementation.error;
 
 /**
- * Various error types given when attempting to join a party.
+ * Various error types given when trying to join a party.
+ * Taken from the logs and from my own testing.
  */
 public enum ErrorType {
 
