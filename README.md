@@ -15,6 +15,7 @@ As always, if you need further help or have any questions please contact me on d
 - Complete party support 
 - Complete friend support, listen for requests, being rejected, etc.
 - Complete chat support, chat with other users.
+- Complete presence support, session ID, parties, and server information!
 
 # Disclaimer
 I am not responsible for any trouble you get into while using this library. I suggest you do not abuse the party system and the XMPP system in general.
