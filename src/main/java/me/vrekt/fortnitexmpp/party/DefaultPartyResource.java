@@ -71,6 +71,12 @@ public final class DefaultPartyResource implements PartyResource {
         members.forEach(member -> sendTo(request, member.user()));
     }
 
+    /**
+     * Send a request to the specified recipient
+     *
+     * @param request   the request
+     * @param recipient the recipient
+     */
     private void sendTo(final PartyRequest request, final Jid recipient) {
         try {
             final var message = new Message(recipient, Message.Type.normal);
@@ -109,6 +115,8 @@ public final class DefaultPartyResource implements PartyResource {
                 final var data = reader.readObject();
                 reader.close();
 
+                listeners.forEach(listener -> listener.onMessageReceived(message));
+
                 final var payload = data.getJsonObject("payload");
 
                 final var type = PartyType.typeOf(data.getString("type"));
@@ -124,7 +132,6 @@ public final class DefaultPartyResource implements PartyResource {
                 // return here since we received something from ourself.
                 if (message.getFrom().asEntityFullJidIfPossible().equals(connection.getUser())) return;
 
-                listeners.forEach(listener -> listener.onMessageReceived(message));
                 // check if the party context needs to be changed.
                 if (partyContext == null) {
                     partyContext = Party.fromPayload(payload);

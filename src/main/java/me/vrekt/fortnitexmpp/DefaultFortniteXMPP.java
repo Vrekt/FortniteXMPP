@@ -14,6 +14,7 @@ import me.vrekt.fortnitexmpp.party.DefaultPartyResource;
 import me.vrekt.fortnitexmpp.party.PartyResource;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
@@ -86,6 +87,7 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
                     .setConnectTimeout(60000)
                     .build());
 
+            // for large friend accounts
             final var roster = Roster.getInstanceFor(connection);
             roster.setRosterLoadedAtLogin(false);
 
@@ -104,6 +106,8 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
             friendResource = new DefaultFriendResource(this);
             partyResource = new DefaultPartyResource(this);
             LOGGER.atInfo().log("Finished loading!");
+
+            connection.sendStanza(new Presence(Presence.Type.available));
         } catch (final IOException | SmackException | XMPPException | InterruptedException exception) {
             throw new XMPPAuthenticationException("Could not connect to the XMPP service.", exception);
         }

@@ -114,7 +114,7 @@ public final class ImmutablePartyMemberData {
         return isReady;
     }
 
-    public boolean isHasPurchasedPass() {
+    public boolean hasPurchasedPass() {
         return hasPurchasedPass;
     }
 

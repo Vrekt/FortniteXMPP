@@ -3,6 +3,8 @@ package me.vrekt.fortnitexmpp.party.implementation;
 import me.vrekt.fortnitexmpp.party.PartyResource;
 import me.vrekt.fortnitexmpp.party.implementation.configuration.PartyConfiguration;
 import me.vrekt.fortnitexmpp.party.implementation.member.PartyMember;
+import me.vrekt.fortnitexmpp.party.implementation.request.configuration.PartyUpdateConfiguration;
+import me.vrekt.fortnitexmpp.party.implementation.request.data.PartyData;
 import me.vrekt.fortnitexmpp.utility.JsonUtility;
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -95,6 +97,9 @@ public final class DefaultParty implements Party {
     @Override
     public Party updateConfigurationAndSend(PartyResource resource, PartyConfiguration configuration) {
         this.configuration = configuration;
+
+        resource.sendRequestTo(new PartyUpdateConfiguration(this, configuration), members);
+        resource.sendRequestTo(PartyData.forNewPrivacySettings(configuration, partyId), members);
         return this;
     }
 
