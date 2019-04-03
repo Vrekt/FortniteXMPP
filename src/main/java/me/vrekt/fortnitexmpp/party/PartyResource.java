@@ -7,7 +7,6 @@ import me.vrekt.fortnitexmpp.party.implementation.request.PartyRequest;
 import org.jxmpp.jid.Jid;
 
 import java.util.Collection;
-import java.util.Optional;
 
 public interface PartyResource extends AutoCloseable {
 
@@ -77,10 +76,15 @@ public interface PartyResource extends AutoCloseable {
     boolean trySendRequestTo(final PartyRequest request, final Iterable<PartyMember> members);
 
     /**
-     * Internally there is a party instance kept updated and only will get cleared when a new packet is received with a ID and key.
-     *
-     * @return the internal party context
+     * @param partyId the ID of the party
+     * @return the party that has the ID or {@code null} if no party was found
      */
-    Optional<Party> partyContext();
+    Party getPartyById(final String partyId);
 
+    /**
+     * Attempts to remove a party by the ID.
+     *
+     * @param partyId the ID of the party
+     */
+    void removePartyById(final String partyId);
 }

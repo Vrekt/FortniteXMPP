@@ -29,18 +29,20 @@ import java.io.StringReader;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class DefaultPartyResource implements PartyResource {
 
     private static final FluentLogger LOGGER = FluentLogger.forEnclosingClass();
+
+    private final Map<String, Party> parties = new ConcurrentHashMap<>();
     private final List<PartyListener> listeners = new CopyOnWriteArrayList<>();
     private final MessageListener messageListener = new MessageListener();
     private final XMPPTCPConnection connection;
 
-    private Party partyContext;
     private boolean log;
 
     /**
@@ -121,15 +123,20 @@ public final class DefaultPartyResource implements PartyResource {
     }
 
     @Override
-    public Optional<Party> partyContext() {
-        return Optional.ofNullable(partyContext);
+    public Party getPartyById(String partyId) {
+        return parties.get(partyId);
+    }
+
+    @Override
+    public void removePartyById(String partyId) {
+        parties.remove(partyId);
     }
 
     @Override
     public void close() {
         connection.removeAsyncStanzaListener(messageListener);
         listeners.clear();
-        partyContext = null;
+        parties.clear();
     }
 
     /**
@@ -171,20 +178,19 @@ public final class DefaultPartyResource implements PartyResource {
                 // return here since we received something from ourself.
                 if (message.getFrom().asEntityFullJidIfPossible().equals(connection.getUser())) return;
 
-                // check if the party context needs to be changed.
-                if (partyContext == null) {
-                    partyContext = Party.fromPayload(payload);
-                } else {
-                    final var partyId = JsonUtility.getString("partyId", payload);
-                    if (partyId.isPresent() && !partyId.get().equals(partyContext.partyId())) {
-                        // different party
-                        partyContext = Party.fromPayload(payload);
-                    }
+                final var partyId = JsonUtility.getString("partyId", payload);
+                if (partyId.isEmpty()) return; // invalid packet?
+                final var from = message.getFrom();
+
+                var party = parties.get(partyId.get());
+                if (party == null) {
+                    party = Party.fromPayload(payload);
+                    parties.put(partyId.get(), party);
                 }
 
                 // update the party and then invoke listeners.
-                updatePartyBasedOnType(partyContext, type, payload, message.getFrom());
-                invokeListeners(partyContext, type, payload, message.getFrom());
+                updatePartyBasedOnType(party, type, payload, from);
+                invokeListeners(party, type, payload, from);
             } catch (final Exception exception) {
                 if (log) LOGGER.atWarning().log("Failed to parse message party JSON.");
             }

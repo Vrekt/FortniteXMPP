@@ -116,6 +116,9 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
             if (!load) roster.setRosterLoadedAtLogin(false);
             if (!load) roster.setSubscriptionMode(Roster.SubscriptionMode.reject_all);
 
+            connection.setUseStreamManagement(true);
+            connection.setUseStreamManagementResumption(true);
+
             connection.connect().login();
             connection.setReplyTimeout(120000);
             this.user = connection.getUser();
