@@ -14,7 +14,9 @@ import me.vrekt.fortnitexmpp.party.DefaultPartyResource;
 import me.vrekt.fortnitexmpp.party.PartyResource;
 import me.vrekt.fortnitexmpp.presence.DefaultPresenceResource;
 import me.vrekt.fortnitexmpp.presence.PresenceResource;
+import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.roster.Roster;
@@ -25,13 +27,22 @@ import org.jxmpp.jid.EntityFullJid;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 public final class DefaultFortniteXMPP implements FortniteXMPP {
 
+    private final ConnectionErrorListener errorListener = new ConnectionErrorListener();
     private static final FluentLogger LOGGER = FluentLogger.forEnclosingClass();
 
-    private final Fortnite fortnite;
+    private final AtomicBoolean reconnecting = new AtomicBoolean(false);
+    private final AtomicBoolean loadRoster = new AtomicBoolean(true);
+
+    private DefaultFortnite.Builder fortniteBuilder;
+
+    private Fortnite fortnite;
     private final AppType appType;
     private final PlatformType platformType;
 
@@ -47,14 +58,19 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
     /**
      * Creates a new instance of {@link FortniteXMPP}
      *
-     * @param fortnite     the already authenticated {@link Fortnite} instance
+     * @param builder      the builder instance used to authenticate to fortnite.
      * @param appType      the application type to use. Either {@code AppType.FORTNITE} or {@code AppType.LAUNCHER}
      * @param platformType the type of platform
      */
-    DefaultFortniteXMPP(final Fortnite fortnite, final AppType appType, final PlatformType platformType) {
-        this.fortnite = fortnite;
-        this.appType = appType;
-        this.platformType = platformType;
+    DefaultFortniteXMPP(final DefaultFortnite.Builder builder, final AppType appType, final PlatformType platformType) throws FortniteAuthenticationException {
+        try {
+            this.fortniteBuilder = builder;
+            this.fortnite = builder.build();
+            this.appType = appType;
+            this.platformType = platformType;
+        } catch (final IOException exception) {
+            throw new FortniteAuthenticationException("Could not authenticate with Fortnite.", exception);
+        }
     }
 
     /**
@@ -67,7 +83,8 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
      */
     DefaultFortniteXMPP(final String emailAddress, final String password, final AppType appType, final PlatformType platformType) throws FortniteAuthenticationException {
         try {
-            this.fortnite = DefaultFortnite.Builder.newInstance(emailAddress, password).build();
+            this.fortniteBuilder = DefaultFortnite.Builder.newInstance(emailAddress, password);
+            this.fortnite = fortniteBuilder.build();
             this.appType = appType;
             this.platformType = platformType;
         } catch (final IOException exception) {
@@ -78,6 +95,7 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
     @Override
     public void connect() throws XMPPAuthenticationException {
         try {
+            reconnecting.set(true);
             fortnite.account().findOneBySessionAccountId().ifPresent(acc -> this.account = acc);
             final var accessToken = fortnite.session().accessToken();
 
@@ -90,16 +108,19 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
                     .setConnectTimeout(60000)
                     .build());
 
-            // for large friend accounts
+            connection.addConnectionListener(errorListener);
+
             final var roster = Roster.getInstanceFor(connection);
-            roster.setRosterLoadedAtLogin(false);
+            final var load = loadRoster.get();
+
+            if (!load) roster.setRosterLoadedAtLogin(false);
+            if (!load) roster.setSubscriptionMode(Roster.SubscriptionMode.reject_all);
 
             connection.connect().login();
             connection.setReplyTimeout(120000);
             this.user = connection.getUser();
 
-            // attempt to load the roster.
-            if (!roster.isLoaded()) roster.reloadAndWait();
+            if (load) if (!roster.isLoaded()) roster.reloadAndWait();
 
             // set the ping interval, makes a more stable connection.
             final var pingManager = PingManager.getInstanceFor(connection);
@@ -110,7 +131,8 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
             partyResource = new DefaultPartyResource(this);
             presenceResource = new DefaultPresenceResource(this);
             connection.sendStanza(new Presence(Presence.Type.available));
-            LOGGER.atInfo().log("Finished loading!");
+            LOGGER.atInfo().log("Connected to the XMPP service successfully.");
+            reconnecting.set(false);
         } catch (final IOException | SmackException | XMPPException | InterruptedException exception) {
             throw new XMPPAuthenticationException("Could not connect to the XMPP service.", exception);
         }
@@ -118,15 +140,43 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
     }
 
     @Override
+    public void reestablishConnectionOnceAfter(final long timeout, final TimeUnit unit) {
+        CompletableFuture.delayedExecutor(timeout, unit).execute(this::reconnectClean);
+    }
+
+    @Override
     public void connectAsync(final Consumer<Boolean> callback) {
         CompletableFuture.runAsync(() -> {
             try {
                 connect();
-                callback.accept(true);
+                if (callback != null) callback.accept(true);
             } catch (final XMPPAuthenticationException exception) {
-                callback.accept(false);
+                if (callback != null) callback.accept(false);
             }
         });
+    }
+
+    @Override
+    public void keepConnectionAlive(final long reconnectionPeriod, final TimeUnit unit) {
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::reconnectClean, reconnectionPeriod, reconnectionPeriod, unit);
+    }
+
+    @Override
+    public boolean isReconnecting() {
+        return reconnecting.get();
+    }
+
+    private void reconnectClean() {
+        LOGGER.atInfo().log("Reconnecting to the XMPP service!");
+        disconnect();
+
+        reconnecting.set(true);
+        try {
+            this.fortnite = fortniteBuilder.build();
+            connect();
+        } catch (final IOException | XMPPAuthenticationException exception) {
+            exception.printStackTrace();
+        }
     }
 
     @Override
@@ -143,6 +193,11 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
     public void logExceptionsAndWarnings(final boolean log) {
         partyResource.logExceptionsAndWarnings(log);
         friendResource.logExceptionsAndWarnings(log);
+    }
+
+    @Override
+    public void setLoadRoster(boolean loadRoster) {
+        this.loadRoster.set(loadRoster);
     }
 
     @Override
@@ -188,5 +243,31 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
     @Override
     public PresenceResource presence() {
         return presenceResource;
+    }
+
+    private final class ConnectionErrorListener implements ConnectionListener {
+        @Override
+        public void connected(XMPPConnection connection) {
+            //
+        }
+
+        @Override
+        public void authenticated(XMPPConnection connection, boolean resumed) {
+            //
+        }
+
+        @Override
+        public void connectionClosed() {
+            //
+        }
+
+        @Override
+        public void connectionClosedOnError(Exception exception) {
+            LOGGER.atSevere().log("Connection closed with error! ", exception.getMessage());
+            LOGGER.atInfo().log("Attempting reconnect in 5 seconds!");
+            reconnecting.set(true);
+
+            CompletableFuture.delayedExecutor(5, TimeUnit.SECONDS).execute(DefaultFortniteXMPP.this::reconnectClean);
+        }
     }
 }

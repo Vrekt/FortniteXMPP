@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class DefaultPartyResource implements PartyResource {
 
@@ -77,13 +78,36 @@ public final class DefaultPartyResource implements PartyResource {
         members.forEach(member -> sendTo(request, member.user()));
     }
 
+    @Override
+    public boolean trySendRequestTo(PartyRequest request, Jid recipient) {
+        return sendTo(request, recipient);
+    }
+
+    @Override
+    public boolean trySendRequestTo(PartyRequest request, Collection<Jid> recipients) {
+        final var failed = new AtomicBoolean(false);
+        recipients.forEach(recipient -> {
+            if (sendTo(request, recipient)) failed.set(true);
+        });
+        return failed.get();
+    }
+
+    @Override
+    public boolean trySendRequestTo(PartyRequest request, Iterable<PartyMember> members) {
+        final var failed = new AtomicBoolean(false);
+        members.forEach(recipient -> {
+            if (sendTo(request, recipient.user())) failed.set(true);
+        });
+        return failed.get();
+    }
+
     /**
      * Send a request to the specified recipient
      *
      * @param request   the request
      * @param recipient the recipient
      */
-    private void sendTo(final PartyRequest request, final Jid recipient) {
+    private boolean sendTo(final PartyRequest request, final Jid recipient) {
         try {
             final var message = new Message(recipient, Message.Type.normal);
             message.setBody(request.payload());
@@ -91,7 +115,9 @@ public final class DefaultPartyResource implements PartyResource {
         } catch (final SmackException.NotConnectedException | InterruptedException exception) {
             // TODO: Ignore log variable here. Maybe change later.
             LOGGER.atSevere().log("Could not send party request!");
+            return true;
         }
+        return false;
     }
 
     @Override
