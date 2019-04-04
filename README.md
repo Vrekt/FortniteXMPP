@@ -1,4 +1,6 @@
-![alt text](https://i.imgur.com/xmvIXPz.jpg)
+<p align="center">
+  <img https://i.imgur.com/xmvIXPz.jpg/>
+</p>
 
 
 # FortniteXMPP2
