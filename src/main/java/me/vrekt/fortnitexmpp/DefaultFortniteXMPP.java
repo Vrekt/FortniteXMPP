@@ -102,7 +102,7 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
             fortnite.account().findOneBySessionAccountId().ifPresent(acc -> this.account = acc);
             final var accessToken = fortnite.session().accessToken();
             final var random = RandomStringUtils.randomAlphanumeric(32).toUpperCase();
-            final var resource = "V2:" + appType.getName() + ":" + platformType.name() + (useExperimentalStuff ? random : "");
+            final var resource = "V2:" + appType.getName() + ":" + platformType.name() + (useExperimentalStuff ? "::" + random : "");
 
             connection = new XMPPTCPConnection(XMPPTCPConnectionConfiguration.builder()
                     .setUsernameAndPassword(account.accountId(), accessToken)
