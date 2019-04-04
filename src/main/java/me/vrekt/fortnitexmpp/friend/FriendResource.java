@@ -1,5 +1,6 @@
 package me.vrekt.fortnitexmpp.friend;
 
+import me.vrekt.fortnitexmpp.FortniteXMPP;
 import me.vrekt.fortnitexmpp.friend.implementation.FriendListener;
 
 public interface FriendResource extends AutoCloseable {
@@ -24,5 +25,17 @@ public interface FriendResource extends AutoCloseable {
      * @param accountId the account ID.
      */
     boolean acceptOrSendFriendRequest(final String accountId);
+
+    /**
+     * Removes stanza listeners but does not clear internal listeners.
+     */
+    void closeDirty();
+
+    /**
+     * Reinitialize this resource for the new connect.
+     *
+     * @param fortniteXMPP the {@link FortniteXMPP} instance
+     */
+    void reinitialize(final FortniteXMPP fortniteXMPP);
 
 }

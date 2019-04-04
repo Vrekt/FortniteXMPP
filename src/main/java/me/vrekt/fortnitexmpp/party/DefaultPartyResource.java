@@ -41,7 +41,7 @@ public final class DefaultPartyResource implements PartyResource {
     private final Map<String, Party> parties = new ConcurrentHashMap<>();
     private final List<PartyListener> listeners = new CopyOnWriteArrayList<>();
     private final MessageListener messageListener = new MessageListener();
-    private final XMPPTCPConnection connection;
+    private XMPPTCPConnection connection;
 
     private boolean log;
 
@@ -139,6 +139,19 @@ public final class DefaultPartyResource implements PartyResource {
         parties.clear();
     }
 
+    @Override
+    public void closeDirty() {
+        connection.removeAsyncStanzaListener(messageListener);
+        // clear parties list?
+    }
+
+    @Override
+    public void reinitialize(final FortniteXMPP fortniteXMPP) {
+        this.connection = fortniteXMPP.connection();
+        connection.addAsyncStanzaListener(messageListener, StanzaTypeFilter.MESSAGE);
+        LOGGER.atInfo().log("PartyResource re-initialized.");
+    }
+
     /**
      * @param log {@code true} if this resource should log exceptions and warnings.
      */
@@ -169,20 +182,24 @@ public final class DefaultPartyResource implements PartyResource {
                 if (type == null) return; // not relevant
 
                 // update the build id
-                if (payload.containsKey("buildId")) {
-                    DefaultParty.buildId = Integer.valueOf(payload.getString("buildId"));
-                } else if (payload.containsKey("buildid")) {
-                    DefaultParty.buildId = Integer.valueOf(payload.getString("buildid"));
-                }
+                JsonUtility.getString("buildId", payload).ifPresent(buildId -> DefaultParty.buildId = Integer.valueOf(buildId));
+                JsonUtility.getString("buildid", payload).ifPresent(buildId -> DefaultParty.buildId = Integer.valueOf(buildId));
 
                 // return here since we received something from ourself.
                 if (message.getFrom().asEntityFullJidIfPossible().equals(connection.getUser())) return;
 
                 final var partyId = JsonUtility.getString("partyId", payload);
+                final var accessKey = JsonUtility.getString("accessKey", payload);
+
                 if (partyId.isEmpty()) return; // invalid packet?
                 final var from = message.getFrom();
 
                 var party = parties.get(partyId.get());
+                if (party != null && accessKey.isPresent() && !party.accessKey().equals(accessKey.get())) {
+                    party = Party.fromPayload(payload);
+                    parties.put(partyId.get(), party);
+                }
+
                 if (party == null) {
                     party = Party.fromPayload(payload);
                     parties.put(partyId.get(), party);
@@ -192,7 +209,7 @@ public final class DefaultPartyResource implements PartyResource {
                 updatePartyBasedOnType(party, type, payload, from);
                 invokeListeners(party, type, payload, from);
             } catch (final Exception exception) {
-                if (log) LOGGER.atWarning().log("Failed to parse message party JSON.");
+                if (log) LOGGER.atWarning().log("Failed to parse message party JSON, cause: " + exception.getMessage());
             }
         }
     }

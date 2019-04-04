@@ -22,8 +22,8 @@ public final class DefaultFriendResource implements FriendResource {
     private static final FluentLogger LOGGER = FluentLogger.forEnclosingClass();
     private final List<FriendListener> listeners = new CopyOnWriteArrayList<>();
     private final MessageListener messageListener = new MessageListener();
-    private final XMPPTCPConnection connection;
-    private final FortniteXMPP fortniteXMPP;
+    private XMPPTCPConnection connection;
+    private FortniteXMPP fortniteXMPP;
 
     private boolean log;
 
@@ -63,6 +63,19 @@ public final class DefaultFriendResource implements FriendResource {
     public void close() {
         connection.removeAsyncStanzaListener(messageListener);
         listeners.clear();
+    }
+
+    @Override
+    public void closeDirty() {
+        connection.removeAsyncStanzaListener(messageListener);
+    }
+
+    @Override
+    public void reinitialize(final FortniteXMPP fortniteXMPP) {
+        this.connection = fortniteXMPP.connection();
+        this.fortniteXMPP = fortniteXMPP;
+        connection.addAsyncStanzaListener(messageListener, StanzaTypeFilter.MESSAGE);
+        LOGGER.atInfo().log("FriendResource re-initialized.");
     }
 
     /**

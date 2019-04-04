@@ -1,5 +1,6 @@
 package me.vrekt.fortnitexmpp.presence;
 
+import me.vrekt.fortnitexmpp.FortniteXMPP;
 import me.vrekt.fortnitexmpp.presence.implementation.listener.FortnitePresenceHandler;
 import me.vrekt.fortnitexmpp.presence.implementation.listener.FortnitePresenceListener;
 import org.jivesoftware.smack.roster.Roster;
@@ -55,5 +56,17 @@ public interface PresenceResource extends AutoCloseable {
      * @return the roster
      */
     Roster roster();
+
+    /**
+     * Removes stanza listeners but does not clear internal listeners.
+     */
+    void closeDirty();
+
+    /**
+     * Reinitialize this resource for the new connect.
+     *
+     * @param fortniteXMPP the {@link FortniteXMPP} instance
+     */
+    void reinitialize(final FortniteXMPP fortniteXMPP);
 
 }

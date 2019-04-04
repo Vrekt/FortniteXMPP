@@ -1,5 +1,6 @@
 package me.vrekt.fortnitexmpp.party;
 
+import me.vrekt.fortnitexmpp.FortniteXMPP;
 import me.vrekt.fortnitexmpp.party.implementation.Party;
 import me.vrekt.fortnitexmpp.party.implementation.listener.PartyListener;
 import me.vrekt.fortnitexmpp.party.implementation.member.PartyMember;
@@ -87,4 +88,17 @@ public interface PartyResource extends AutoCloseable {
      * @param partyId the ID of the party
      */
     void removePartyById(final String partyId);
+
+    /**
+     * Removes stanza listeners but does not clear internal listeners.
+     */
+    void closeDirty();
+
+    /**
+     * Reinitialize this resource for the new connect.
+     *
+     * @param fortniteXMPP the {@link FortniteXMPP} instance
+     */
+    void reinitialize(final FortniteXMPP fortniteXMPP);
+
 }

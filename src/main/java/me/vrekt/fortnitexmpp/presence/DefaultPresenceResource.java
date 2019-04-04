@@ -1,5 +1,6 @@
 package me.vrekt.fortnitexmpp.presence;
 
+import com.google.common.flogger.FluentLogger;
 import me.vrekt.fortnitexmpp.FortniteXMPP;
 import me.vrekt.fortnitexmpp.presence.implementation.FortnitePresence;
 import me.vrekt.fortnitexmpp.presence.implementation.listener.FortnitePresenceHandler;
@@ -16,12 +17,13 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public final class DefaultPresenceResource implements PresenceResource {
+    private static final FluentLogger LOGGER = FluentLogger.forEnclosingClass();
 
     private final List<FortnitePresenceListener> listeners = new CopyOnWriteArrayList<>();
     private final List<FortnitePresenceHandler> handlers = new CopyOnWriteArrayList<>();
     private final PresenceListener presenceListener = new PresenceListener();
-    private final XMPPTCPConnection connection;
-    private final Roster roster;
+    private XMPPTCPConnection connection;
+    private Roster roster;
 
     private boolean onlyHandleAvailablePresences;
 
@@ -90,6 +92,18 @@ public final class DefaultPresenceResource implements PresenceResource {
         connection.removeAsyncStanzaListener(presenceListener);
         listeners.clear();
         handlers.clear();
+    }
+
+    @Override
+    public void closeDirty() {
+        connection.removeAsyncStanzaListener(presenceListener);
+    }
+
+    @Override
+    public void reinitialize(final FortniteXMPP fortniteXMPP) {
+        this.roster = Roster.getInstanceFor(fortniteXMPP.connection());
+        connection.addAsyncStanzaListener(presenceListener, StanzaTypeFilter.PRESENCE);
+        LOGGER.atInfo().log("PresenceResource re-initialized.");
     }
 
     /**

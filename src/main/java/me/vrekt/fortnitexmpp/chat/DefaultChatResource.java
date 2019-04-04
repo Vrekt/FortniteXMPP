@@ -1,5 +1,6 @@
 package me.vrekt.fortnitexmpp.chat;
 
+import com.google.common.flogger.FluentLogger;
 import me.vrekt.fortnitexmpp.FortniteXMPP;
 import me.vrekt.fortnitexmpp.chat.implementation.IncomingMessageListener;
 import org.jivesoftware.smack.SmackException;
@@ -14,10 +15,11 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public final class DefaultChatResource implements ChatResource {
+    private static final FluentLogger LOGGER = FluentLogger.forEnclosingClass();
 
     private final List<IncomingMessageListener> listeners = new CopyOnWriteArrayList<>();
     private final MessageListener messageListener = new MessageListener();
-    private final ChatManager chatManager;
+    private ChatManager chatManager;
 
     /**
      * Initialize this resource.
@@ -41,7 +43,7 @@ public final class DefaultChatResource implements ChatResource {
 
     @Override
     public boolean sendMessage(final String accountId, final String message) {
-        EntityBareJid to = JidCreate.entityBareFromOrThrowUnchecked(accountId + "@" + FortniteXMPP.SERVICE_DOMAIN);
+        final var to = JidCreate.entityBareFromOrThrowUnchecked(accountId + "@" + FortniteXMPP.SERVICE_DOMAIN);
         return sendMessage(to, message);
     }
 
@@ -64,6 +66,18 @@ public final class DefaultChatResource implements ChatResource {
     public void close() {
         chatManager.removeIncomingListener(messageListener);
         listeners.clear();
+    }
+
+    @Override
+    public void closeDirty() {
+        chatManager.removeIncomingListener(messageListener);
+    }
+
+    @Override
+    public void reinitialize(final FortniteXMPP fortniteXMPP) {
+        chatManager = ChatManager.getInstanceFor(fortniteXMPP.connection());
+        chatManager.addIncomingListener(messageListener);
+        LOGGER.atInfo().log("ChatResource re-initialized.");
     }
 
     /**

@@ -1,5 +1,6 @@
 package me.vrekt.fortnitexmpp.chat;
 
+import me.vrekt.fortnitexmpp.FortniteXMPP;
 import me.vrekt.fortnitexmpp.chat.implementation.IncomingMessageListener;
 import org.jivesoftware.smack.chat2.ChatManager;
 import org.jxmpp.jid.EntityBareJid;
@@ -43,5 +44,16 @@ public interface ChatResource extends AutoCloseable {
      */
     ChatManager chatManager();
 
+    /**
+     * Removes stanza listeners but does not clear internal listeners.
+     */
+    void closeDirty();
+
+    /**
+     * Reinitialize this resource for the new connect.
+     *
+     * @param fortniteXMPP the {@link FortniteXMPP} instance
+     */
+    void reinitialize(final FortniteXMPP fortniteXMPP);
 
 }
