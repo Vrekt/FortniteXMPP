@@ -18,7 +18,7 @@ public interface Party {
      * @param configuration the configuration
      * @return a new {@link Party}
      */
-    static Party createParty(PartyConfiguration configuration) {
+    static Party createParty(final PartyConfiguration configuration) {
         return new DefaultParty(configuration);
     }
 
@@ -28,7 +28,7 @@ public interface Party {
      * @param payload the payload
      * @return a new {@link Party}
      */
-    static Party fromPayload(JsonObject payload) {
+    static Party fromPayload(final JsonObject payload) {
         return new DefaultParty(payload);
     }
 
@@ -43,11 +43,6 @@ public interface Party {
     String accessKey();
 
     /**
-     * @return the leader of the party, or {@code null} if this is a fake party.
-     */
-    PartyMember leader();
-
-    /**
      * @return a set of members who are in this party.
      */
     List<PartyMember> members();
@@ -57,28 +52,29 @@ public interface Party {
      *
      * @param member the member
      */
-    void addMember(PartyMember member);
+    void addMember(final PartyMember member);
 
     /**
      * Remove a member from this party
      *
      * @param member the member
      */
-    void removeMember(PartyMember member);
+    void removeMember(final PartyMember member);
 
     /**
      * Remove a member from this party
      *
      * @param accountId the account ID.
      */
-    void removeMemberById(String accountId);
+    void removeMemberById(final String accountId);
 
     /**
-     * Set the party leader
+     * Attempts to get a member by their account ID.
      *
-     * @param member the leader
+     * @param accountId the ID of the member
+     * @return the member that has the provided {@code accountId} or {@code null} if none was found.
      */
-    void setLeader(PartyMember member);
+    PartyMember getMemberById(final String accountId);
 
     /**
      * This method will update the configuration and then send it to all party members.
@@ -87,7 +83,7 @@ public interface Party {
      * @param configuration the configuration
      * @return this {@link Party}
      */
-    Party updateConfigurationAndSend(PartyResource resource, PartyConfiguration configuration);
+    Party updateConfigurationAndSend(final PartyResource resource, final PartyConfiguration configuration);
 
     /**
      * This method will update the configuration.
@@ -95,7 +91,7 @@ public interface Party {
      * @param configuration the configuration
      * @return this {@link Party}
      */
-    Party updateConfiguration(PartyConfiguration configuration);
+    Party updateConfiguration(final PartyConfiguration configuration);
 
     /**
      * @return the current {@link PartyConfiguration} associated with this {@link Party}

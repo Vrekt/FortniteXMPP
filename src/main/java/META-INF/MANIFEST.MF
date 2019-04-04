@@ -8,5 +8,4 @@ Class-Path: httpcore-4.4.11.jar xpp3-1.1.4c.jar commons-lang3-3.8.1.ja
  a.json-1.1.5.jar jsr305-3.0.1.jar minidns-core-0.3.4.jar smack-resolv
  er-javax-4.3.3.jar smack-java7-4.3.3.jar flogger-system-backend-0.4.j
  ar smack-extensions-4.3.3.jar commons-logging-1.2.jar
-Main-Class: 
 

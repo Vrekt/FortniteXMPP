@@ -144,6 +144,8 @@ public interface FortniteXMPP {
      */
     PresenceResource presence();
 
+    void useExperimentalStuff();
+
     /**
      * Valid types for the XMPP service.
      */

@@ -85,6 +85,99 @@ public final class PartyMemberData implements PartyRequest {
     }
 
     /**
+     * Create a new {@link PartyMemberData} set for yourself.
+     * This method is used for when you dealing with multiple parties and want to build your own set
+     * of data when required instead of storing it.
+     *
+     * @param skin         the skin to use
+     * @param backbling    the backbling to use, or {@code "None"} for no backbling.
+     * @param inputType    the input type to use
+     * @param platformType the desired platform
+     * @return a new {@link PartyMemberData} instance
+     */
+    public static PartyMemberData forMyselfOnce(final String skin, final String backbling, final InputType inputType, final FortniteXMPP.PlatformType platformType,
+                                                final String partyId) {
+        final var data = new PartyMemberData(skin, backbling, inputType, null, platformType);
+        data.setPartyIdAndBuild(partyId);
+        return data;
+    }
+
+    /**
+     * Create a new {@link PartyMemberData} set for yourself.
+     * This method is used for when you dealing with multiple parties and want to build your own set
+     * of data when required instead of storing it.
+     *
+     * @param skin         the skin to use
+     * @param backbling    the backbling to use, or {@code "None"} for no backbling.
+     * @param inputType    the input type to use
+     * @param platformType the desired platform
+     * @return a new {@link PartyMemberData} instance
+     */
+    public static PartyMemberData forMyselfOnce(final Skin skin, final String backbling, final InputType inputType, final FortniteXMPP.PlatformType platformType,
+                                                final String partyId) {
+        final var data = new PartyMemberData(skin.name(), backbling, inputType, null, platformType);
+        data.setPartyIdAndBuild(partyId);
+        return data;
+    }
+
+    /**
+     * Create a new {@link PartyMemberData} set for yourself.
+     * This method is used for when you dealing with multiple parties and want to build your own set
+     * of data when required instead of storing it.
+     *
+     * @param skin         the skin to use
+     * @param backbling    the backbling to use, or {@code "None"} for no backbling.
+     * @param inputType    the input type to use
+     * @param platformType the desired platform
+     * @return a new {@link PartyMemberData} instance
+     */
+    public static PartyMemberData forMyselfOnce(final Skin skin, final Backbling backbling, final InputType inputType, final FortniteXMPP.PlatformType platformType,
+                                                final String partyId) {
+        final var data = new PartyMemberData(skin.name(), backbling.getName(), inputType, null, platformType);
+        data.setPartyIdAndBuild(partyId);
+        return data;
+    }
+
+    /**
+     * Create a new {@link PartyMemberData} set for yourself.
+     * This method is used for when you dealing with multiple parties and want to build your own set
+     * of data when required instead of storing it.
+     *
+     * @param skin         the skin to use
+     * @param backbling    the backbling to use, or {@code "None"} for no backbling.
+     * @param battlePass   the battle pass to use.
+     * @param inputType    the input type to use
+     * @param platformType the desired platform
+     * @return a new {@link PartyMemberData} instance
+     */
+    public static PartyMemberData forMyselfOnce(final String skin, final String backbling, final BattlePass battlePass, final InputType inputType,
+                                                final FortniteXMPP.PlatformType platformType, final String partyId) {
+        final var data = new PartyMemberData(skin, backbling, inputType, battlePass, platformType);
+        data.setPartyIdAndBuild(partyId);
+        return data;
+    }
+
+    /**
+     * Create a new {@link PartyMemberData} set for yourself.
+     * This method is used for when you dealing with multiple parties and want to build your own set
+     * of data when required instead of storing it.
+     *
+     * @param skin         the skin to use
+     * @param backbling    the backbling to use, or {@code "None"} for no backbling.
+     * @param battlePass   the battle pass to use.
+     * @param inputType    the input type to use
+     * @param platformType the desired platform
+     * @return a new {@link PartyMemberData} instance
+     */
+    public static PartyMemberData forMyselfOnce(final String skin, final Backbling backbling, final BattlePass battlePass, final InputType inputType,
+                                                final FortniteXMPP.PlatformType platformType, final String partyId) {
+        final var data = new PartyMemberData(skin, backbling.getName(), inputType, battlePass, platformType);
+        data.setPartyIdAndBuild(partyId);
+        return data;
+    }
+
+
+    /**
      * Create a new {@link PartyMemberData} with the provided {@code skin}
      *
      * @param skin the skin to use

@@ -23,7 +23,6 @@ public final class DefaultParty implements Party {
     private final String partyId, accessKey;
 
     private PartyConfiguration configuration;
-    private PartyMember partyLeader;
 
     /**
      * Creates a new {@link Party} from the provided configuration.
@@ -63,11 +62,6 @@ public final class DefaultParty implements Party {
     }
 
     @Override
-    public PartyMember leader() {
-        return partyLeader;
-    }
-
-    @Override
     public List<PartyMember> members() {
         return members;
     }
@@ -90,8 +84,8 @@ public final class DefaultParty implements Party {
     }
 
     @Override
-    public void setLeader(PartyMember member) {
-        this.partyLeader = member;
+    public PartyMember getMemberById(String accountId) {
+        return members.stream().filter(member -> member.accountId().equals(accountId)).findAny().orElse(null);
     }
 
     @Override
