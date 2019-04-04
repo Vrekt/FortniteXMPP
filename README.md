@@ -30,6 +30,10 @@ As always, if you need further help or have any questions please contact me on d
 
 [Click here](https://github.com/Vrekt/FortniteXMPP2/wiki/Roster-and-better-connection-handling)
 
+**USING MULTIPLE ACCOUNTS**
+
+[Click here](https://github.com/Vrekt/FortniteXMPP2/wiki/Using-multiple-accounts)
+
 # Credits
 - [Kysune](https://github.com/SzymonLisowiec)
 - [RoberoGraham](https://github.com/RobertoGraham/fortnite-2)
