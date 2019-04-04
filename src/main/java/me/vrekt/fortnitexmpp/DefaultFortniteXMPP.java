@@ -130,12 +130,16 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
             // set the ping interval, makes a more stable connection.
             final var pingManager = PingManager.getInstanceFor(connection);
             pingManager.setPingInterval(60);
+            pingManager.registerPingFailedListener(() -> {
+                LOGGER.atSevere().log("Ping failed, attempting reconnect.");
+                reconnectClean();
+            });
 
-            chatResource = new DefaultChatResource(this);
-            friendResource = new DefaultFriendResource(this);
-            partyResource = new DefaultPartyResource(this);
-            presenceResource = new DefaultPresenceResource(this);
-
+            // make sure we only create the resource if its null
+            if (chatResource == null) chatResource = new DefaultChatResource(this);
+            if (friendResource == null) friendResource = new DefaultFriendResource(this);
+            if (partyResource == null) partyResource = new DefaultPartyResource(this);
+            if (presenceResource == null) presenceResource = new DefaultPresenceResource(this);
 
             connection.sendStanza(new Presence(Presence.Type.available));
             LOGGER.atInfo().log("Connected to the XMPP service successfully.");
@@ -143,7 +147,6 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
         } catch (final IOException | SmackException | XMPPException | InterruptedException exception) {
             throw new XMPPAuthenticationException("Could not connect to the XMPP service.", exception);
         }
-
     }
 
     @Override
@@ -178,9 +181,8 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
      */
     private void reconnectClean() {
         LOGGER.atInfo().log("Reconnecting to the XMPP service!");
-        disconnect();
+        disconnectWithoutClosingResources();
 
-        reconnecting.set(true);
         try {
             this.fortnite = fortniteBuilder.build();
             connect();
@@ -196,6 +198,14 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
         friendResource.close();
         partyResource.close();
         presenceResource.close();
+        connection.disconnect();
+    }
+
+    /**
+     * Disconnects without closing the existing resources.
+     */
+    private void disconnectWithoutClosingResources() {
+        fortnite.close();
         connection.disconnect();
     }
 
@@ -280,8 +290,8 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
         public void connectionClosedOnError(Exception exception) {
             LOGGER.atSevere().log("Connection closed with error! ", exception.getMessage());
             LOGGER.atInfo().log("Attempting reconnect in 5 seconds!");
-            reconnecting.set(true);
 
+            reconnecting.set(true);
             CompletableFuture.delayedExecutor(5, TimeUnit.SECONDS).execute(DefaultFortniteXMPP.this::reconnectClean);
         }
     }
