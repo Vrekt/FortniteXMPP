@@ -10,35 +10,15 @@ Check out the [wiki](https://github.com/Vrekt/FortniteXMPP2/wiki). The wiki is s
 
 As always, if you need further help or have any questions please contact me on discord: vrekt#4387
 
-**GETTING STARTED**
+- Getting started, click [here](https://github.com/Vrekt/FortniteXMPP2/wiki/Login-to-initialize-a-new-instance)
+- Parties, click [here](https://github.com/Vrekt/FortniteXMPP2/wiki/All-about-parties)
+- Friends, click [here](https://github.com/Vrekt/FortniteXMPP2/wiki/How-to-listen-for-certain-friend-events)
+- Chat, click [here](https://github.com/Vrekt/FortniteXMPP2/wiki/How-to-listen-and-reply-to-messages)
+- Presence, click [here](https://github.com/Vrekt/FortniteXMPP2/wiki/Presence)
+- Connection stuff, click [here](https://github.com/Vrekt/FortniteXMPP2/wiki/Roster-and-better-connection-handling)
+- Using multiple accounts, click [here](https://github.com/Vrekt/FortniteXMPP2/wiki/Using-multiple-accounts)
 
-[Click here](https://github.com/Vrekt/FortniteXMPP2/wiki/Login-to-initialize-a-new-instance)
-
-**PARTIES**
-
-[Click here](https://github.com/Vrekt/FortniteXMPP2/wiki/All-about-parties)
-
-**FRIENDS**
-
-[Click here](https://github.com/Vrekt/FortniteXMPP2/wiki/How-to-listen-for-certain-friend-events)
-
-**CHAT**
-
-[Click here](https://github.com/Vrekt/FortniteXMPP2/wiki/How-to-listen-and-reply-to-messages)
-
-**PRESENCE**
-
-[Click here](https://github.com/Vrekt/FortniteXMPP2/wiki/Presence)
-
-**CONNECTION STUFF**
-
-[Click here](https://github.com/Vrekt/FortniteXMPP2/wiki/Roster-and-better-connection-handling)
-
-**USING MULTIPLE ACCOUNTS**
-
-[Click here](https://github.com/Vrekt/FortniteXMPP2/wiki/Using-multiple-accounts)
-
-# Credits
+# People who have helped me along the way
 - [Kysune](https://github.com/SzymonLisowiec)
 - [RoberoGraham](https://github.com/RobertoGraham/fortnite-2)
 - [lorpus](https://github.com/lorpus)
