@@ -12,6 +12,7 @@ import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.impl.JidCreate;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public final class DefaultChatResource implements ChatResource {
@@ -43,16 +44,20 @@ public final class DefaultChatResource implements ChatResource {
 
     @Override
     public boolean sendMessage(final String accountId, final String message) {
+        Objects.requireNonNull(accountId, "Account ID cannot be null.");
+        Objects.requireNonNull(message, "Message cannot be null.");
         final var to = JidCreate.entityBareFromOrThrowUnchecked(accountId + "@" + FortniteXMPP.SERVICE_DOMAIN);
         return sendMessage(to, message);
     }
 
     @Override
     public boolean sendMessage(final EntityBareJid user, final String message) {
+        Objects.requireNonNull(user, "User cannot be null.");
+        Objects.requireNonNull(message, "Message cannot be null.");
         try {
             chatManager.chatWith(user).send(message);
         } catch (final SmackException.NotConnectedException | InterruptedException exception) {
-            return false;
+            LOGGER.atWarning().withCause(exception).log("Failed to send message to: " + user.asUnescapedString());
         }
         return true;
     }

@@ -5,6 +5,7 @@ import me.vrekt.fortnitexmpp.FortniteXMPP;
 import me.vrekt.fortnitexmpp.friend.implementation.FriendListener;
 import me.vrekt.fortnitexmpp.friend.type.FriendType;
 import me.vrekt.fortnitexmpp.utility.JsonUtility;
+import me.vrekt.fortnitexmpp.utility.Logging;
 import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.filter.StanzaTypeFilter;
 import org.jivesoftware.smack.packet.Message;
@@ -15,6 +16,7 @@ import javax.json.Json;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public final class DefaultFriendResource implements FriendResource {
@@ -25,16 +27,17 @@ public final class DefaultFriendResource implements FriendResource {
     private XMPPTCPConnection connection;
     private FortniteXMPP fortniteXMPP;
 
-    private boolean log;
+    private boolean enableLogging;
 
     /**
      * Initialize this resource
      *
      * @param fortniteXMPP the {@link FortniteXMPP} instance
      */
-    public DefaultFriendResource(final FortniteXMPP fortniteXMPP) {
+    public DefaultFriendResource(final FortniteXMPP fortniteXMPP, final boolean enableLogging) {
         this.connection = fortniteXMPP.connection();
         this.fortniteXMPP = fortniteXMPP;
+        this.enableLogging = enableLogging;
         connection.addAsyncStanzaListener(messageListener, StanzaTypeFilter.MESSAGE);
     }
 
@@ -50,10 +53,12 @@ public final class DefaultFriendResource implements FriendResource {
 
     @Override
     public boolean acceptOrSendFriendRequest(final String accountId) {
+        Objects.requireNonNull(accountId, "Account ID cannot be null.");
         try {
             fortniteXMPP.fortnite().friend().addOneByAccountId(accountId);
+            Logging.logInfoIfApplicable(LOGGER.atInfo(), enableLogging, "Added or sent a friend request to: " + accountId);
         } catch (final IOException exception) {
-            if (log) LOGGER.atWarning().log("Could not accept the friend request from: " + accountId);
+            LOGGER.atWarning().withCause(exception).log("Could not send or accept friend request to: " + accountId);
             return false;
         }
         return true;
@@ -79,13 +84,6 @@ public final class DefaultFriendResource implements FriendResource {
     }
 
     /**
-     * @param log {@code true} if this resource should log exceptions and warnings.
-     */
-    public void logExceptionsAndWarnings(final boolean log) {
-        this.log = log;
-    }
-
-    /**
      * Listens for {@link me.vrekt.fortnitexmpp.friend.type.FriendType} related messages.
      */
     private final class MessageListener implements StanzaListener {
@@ -101,6 +99,8 @@ public final class DefaultFriendResource implements FriendResource {
 
                 final var type = FriendType.typeOf(JsonUtility.getString("type", data).orElse(null));
                 if (type == null) return; // not relevant
+
+                Logging.logInfoIfApplicable(LOGGER.atInfo(), enableLogging, "Friend message type: " + type.getName() + "\nWith payload: " + data.toString());
 
                 listeners.forEach(listener -> listener.onXMPPFriendMessage(message));
 
@@ -142,7 +142,7 @@ public final class DefaultFriendResource implements FriendResource {
                 }
 
             } catch (final Exception exception) {
-                if (log) LOGGER.atWarning().log("Failed to parse message JSON.");
+                LOGGER.atWarning().log("Failed to parse message JSON. from: " + packet.getFrom().asUnescapedString());
             }
         }
     }

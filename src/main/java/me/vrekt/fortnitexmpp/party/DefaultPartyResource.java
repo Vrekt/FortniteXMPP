@@ -15,6 +15,7 @@ import me.vrekt.fortnitexmpp.party.implementation.request.general.InvitationResp
 import me.vrekt.fortnitexmpp.party.type.PartyType;
 import me.vrekt.fortnitexmpp.utility.FindPlatformUtility;
 import me.vrekt.fortnitexmpp.utility.JsonUtility;
+import me.vrekt.fortnitexmpp.utility.Logging;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.filter.StanzaTypeFilter;
@@ -44,15 +45,16 @@ public final class DefaultPartyResource implements PartyResource {
     private final MessageListener messageListener = new MessageListener();
     private XMPPTCPConnection connection;
 
-    private boolean log;
+    private boolean enableLogging;
 
     /**
      * Initialize this resource
      *
      * @param fortniteXMPP the {@link FortniteXMPP} instance
      */
-    public DefaultPartyResource(final FortniteXMPP fortniteXMPP) {
+    public DefaultPartyResource(final FortniteXMPP fortniteXMPP, final boolean enableLogging) {
         this.connection = fortniteXMPP.connection();
+        this.enableLogging = enableLogging;
         connection.addAsyncStanzaListener(messageListener, StanzaTypeFilter.MESSAGE);
     }
 
@@ -111,13 +113,15 @@ public final class DefaultPartyResource implements PartyResource {
      * @param recipient the recipient
      */
     private boolean sendTo(final PartyRequest request, final Jid recipient) {
+        Logging.logInfoIfApplicable(LOGGER.atInfo(), enableLogging, "Sending request to: " + recipient.asUnescapedString() + "\nWith payload: " + request.payload());
+
         try {
             final var message = new Message(recipient, Message.Type.normal);
             message.setBody(request.payload());
             connection.sendStanza(message);
         } catch (final SmackException.NotConnectedException | InterruptedException exception) {
             // TODO: Ignore log variable here. Maybe change later.
-            LOGGER.atSevere().log("Could not send party request!");
+            LOGGER.atWarning().withCause(exception).log("Failed to send party request.");
             return true;
         }
         return false;
@@ -153,13 +157,6 @@ public final class DefaultPartyResource implements PartyResource {
     }
 
     /**
-     * @param log {@code true} if this resource should log exceptions and warnings.
-     */
-    public void logExceptionsAndWarnings(final boolean log) {
-        this.log = log;
-    }
-
-    /**
      * Listens for the party messages
      */
     private final class MessageListener implements StanzaListener {
@@ -173,13 +170,16 @@ public final class DefaultPartyResource implements PartyResource {
                 final var data = reader.readObject();
                 reader.close();
 
-                // TODO: Move this down later? This will print messages from other stuff like friends, etc.
-                listeners.forEach(listener -> listener.onMessageReceived(message));
+                // acts to log all message even if they are not a party message
+                Logging.logInfoIfApplicable(LOGGER.atInfo(), enableLogging, "Received XMPP message from: " + message.getFrom().asUnescapedString() + "\nWith payload: " + data.toString());
 
                 final var payload = data.getJsonObject("payload");
 
                 final var type = PartyType.typeOf(data.getString("type"));
                 if (type == null) return; // not relevant
+
+                // TODO: Move this down later? This will print messages from other stuff like friends, etc.
+                listeners.forEach(listener -> listener.onMessageReceived(message));
 
                 // update the build id
                 JsonUtility.getString("buildId", payload).ifPresent(buildId -> DefaultParty.buildId = Integer.valueOf(buildId));
@@ -196,6 +196,7 @@ public final class DefaultPartyResource implements PartyResource {
 
                 var party = parties.get(partyId.get());
                 if (party != null && accessKey.isPresent() && !party.accessKey().equals(accessKey.get())) {
+                    Logging.logInfoIfApplicable(LOGGER.atInfo(), enableLogging, "Access key changed for party: " + party.partyId() + ". Attempting to retrieve new key if possible.");
                     party = Party.fromPayload(payload);
 
                     // update party leader
@@ -206,6 +207,7 @@ public final class DefaultPartyResource implements PartyResource {
 
                 if (party == null) {
                     party = Party.fromPayload(payload);
+                    Logging.logInfoIfApplicable(LOGGER.atInfo(), enableLogging, "Party " + party.partyId() + " created!");
 
                     // update party leader
                     final var accountId = from.getLocalpartOrNull().asUnescapedString();
@@ -217,7 +219,7 @@ public final class DefaultPartyResource implements PartyResource {
                 updatePartyBasedOnType(party, type, payload, from);
                 invokeListeners(party, type, payload, from);
             } catch (final Exception exception) {
-                if (log) LOGGER.atWarning().withCause(exception).log("Failed to parse party message.");
+                LOGGER.atWarning().withCause(exception).log("Failed to parse party message. from: " + packet.getFrom().asUnescapedString());
             }
         }
     }
@@ -435,8 +437,7 @@ public final class DefaultPartyResource implements PartyResource {
      * @param from    who it was sent from
      */
     private void logMalformedType(final PartyType type, final JsonObject payload, final Jid from) {
-        if (log)
-            LOGGER.atWarning().log("Invalid party message received from: " + from.asUnescapedString() + "\nType: " + type.getName() + "\nPayload as string: " + payload.toString());
+        LOGGER.atWarning().log("Invalid party message received from: " + from.asUnescapedString() + "\nType: " + type.getName() + "\nPayload as string: " + payload.toString());
     }
 
 }

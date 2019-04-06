@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 public final class FortniteXMPPConfiguration {
 
-    private final boolean logExceptions, loadRoster, reconnectOnError;
+    private final boolean enableLogging, loadRoster, reconnectOnError;
     private long keepAlivePeriod = -1, reconnectionWaitTime = 5;
     private TimeUnit timeUnit;
 
@@ -18,11 +18,11 @@ public final class FortniteXMPPConfiguration {
     /**
      * Initialize this configuration
      *
-     * @param logExceptions {@code true} if exceptions and warnings should be logged.
+     * @param enableLogging {@code true} if debug logging should be enabled
      * @param loadRoster    {@code true} if the roster should be loaded on login.
      */
-    public FortniteXMPPConfiguration(final boolean logExceptions, final boolean loadRoster, final boolean reconnectOnError) {
-        this.logExceptions = logExceptions;
+    public FortniteXMPPConfiguration(final boolean enableLogging, final boolean loadRoster, final boolean reconnectOnError) {
+        this.enableLogging = enableLogging;
         this.loadRoster = loadRoster;
         this.reconnectOnError = reconnectOnError;
     }
@@ -30,20 +30,20 @@ public final class FortniteXMPPConfiguration {
     /**
      * Initialize this configuration
      *
-     * @param logExceptions        {@code true} if exceptions and warnings should be logged.
+     * @param enableLogging        {@code true} if debug logging should be enabled
      * @param loadRoster           {@code true} if the roster should be loaded on login.
      * @param reconnectOnError     {@code true} if a reconnect should be attempted on a connection error
      * @param reconnectionWaitTime if an error would to occur that would close the connection then this parameter specifies how long to wait before reconnecting in seconds.
      */
-    public FortniteXMPPConfiguration(final boolean logExceptions, final boolean loadRoster, final boolean reconnectOnError, final long reconnectionWaitTime) {
-        this(logExceptions, loadRoster, reconnectOnError);
+    public FortniteXMPPConfiguration(final boolean enableLogging, final boolean loadRoster, final boolean reconnectOnError, final long reconnectionWaitTime) {
+        this(enableLogging, loadRoster, reconnectOnError);
         this.reconnectionWaitTime = reconnectionWaitTime;
     }
 
     /**
      * Initialize this configuration
      *
-     * @param logExceptions    {@code true} if exceptions and warnings should be logged.
+     * @param enableLogging    {@code true} if debug logging should be enabled
      * @param loadRoster       {@code true} if the roster should be loaded on login.
      * @param reconnectOnError {@code true} if a reconnect should be attempted on a connection error
      * @param keepAlivePeriod  the time between reconnects.
@@ -51,8 +51,8 @@ public final class FortniteXMPPConfiguration {
      *                         then every 7 hours the service will disconnect from XMPP, renew the fortnite access token and reconnect.
      * @param timeUnit         the time unit to use
      */
-    public FortniteXMPPConfiguration(final boolean logExceptions, final boolean loadRoster, final boolean reconnectOnError, final long keepAlivePeriod, final TimeUnit timeUnit) {
-        this(logExceptions, loadRoster, reconnectOnError);
+    public FortniteXMPPConfiguration(final boolean enableLogging, final boolean loadRoster, final boolean reconnectOnError, final long keepAlivePeriod, final TimeUnit timeUnit) {
+        this(enableLogging, loadRoster, reconnectOnError);
         this.keepAlivePeriod = keepAlivePeriod;
         this.timeUnit = timeUnit;
     }
@@ -60,7 +60,7 @@ public final class FortniteXMPPConfiguration {
     /**
      * Initialize this configuration
      *
-     * @param logExceptions        {@code true} if exceptions and warnings should be logged.
+     * @param enableLogging        {@code true} if debug logging should be enabled
      * @param loadRoster           {@code true} if the roster should be loaded on login.
      * @param reconnectOnError     {@code true} if a reconnect should be attempted on a connection error
      * @param keepAlivePeriod      the time between reconnects.
@@ -69,14 +69,14 @@ public final class FortniteXMPPConfiguration {
      * @param timeUnit             the time unit to use
      * @param reconnectionWaitTime if an error would to occur that would close the connection then this parameter specifies how long to wait before reconnecting in seconds.
      */
-    public FortniteXMPPConfiguration(final boolean logExceptions, final boolean loadRoster, final boolean reconnectOnError, final long keepAlivePeriod, final TimeUnit timeUnit,
+    public FortniteXMPPConfiguration(final boolean enableLogging, final boolean loadRoster, final boolean reconnectOnError, final long keepAlivePeriod, final TimeUnit timeUnit,
                                      final long reconnectionWaitTime) {
-        this(logExceptions, loadRoster, reconnectOnError, keepAlivePeriod, timeUnit);
+        this(enableLogging, loadRoster, reconnectOnError, keepAlivePeriod, timeUnit);
         this.reconnectionWaitTime = reconnectionWaitTime;
     }
 
-    public boolean doLogExceptions() {
-        return logExceptions;
+    public boolean doEnableLogging() {
+        return enableLogging;
     }
 
     public boolean doLoadRoster() {

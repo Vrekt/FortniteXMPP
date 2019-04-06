@@ -25,7 +25,9 @@ public final class DefaultPresenceResource implements PresenceResource {
     private XMPPTCPConnection connection;
     private Roster roster;
 
-    private boolean onlyHandleAvailablePresences;
+    // currently no use for debug logging, but keep it here for now.
+    // do not log incoming presences, could get very spammy.
+    private boolean onlyHandleAvailablePresences, enableLogging;
 
     /**
      * Initialize this resource
@@ -68,7 +70,7 @@ public final class DefaultPresenceResource implements PresenceResource {
                 roster.reload();
             }
         } catch (final SmackException.NotLoggedInException | SmackException.NotConnectedException | InterruptedException exception) {
-            exception.printStackTrace();
+            LOGGER.atWarning().withCause(exception).log("Failed to reload roster. If you have large friend accounts its not recommended to reload or load the roster!");
         }
     }
 

@@ -101,4 +101,8 @@ public interface PartyResource extends AutoCloseable {
      */
     void reinitialize(final FortniteXMPP fortniteXMPP);
 
+    /**
+     * enables debug logging for this resource.
+     */
+
 }

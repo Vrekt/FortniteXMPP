@@ -116,6 +116,7 @@ public final class MultipleAccountsProvider {
                 LOGGER.atWarning().withCause(exception).log("Failed to connect one account!");
             }
         });
+        providers.clear();
     }
 
     /**
@@ -149,6 +150,7 @@ public final class MultipleAccountsProvider {
                 exception.printStackTrace();
             }
 
+            providers.clear();
             callback.accept(result.get());
         });
     }
@@ -162,6 +164,7 @@ public final class MultipleAccountsProvider {
     public List<CompletableFuture<FortniteXMPP>> connectAllAsync() {
         final var futures = new ArrayList<CompletableFuture<FortniteXMPP>>();
         providers.forEach(provider -> futures.add(authenticateAndConnectAsync(provider)));
+        providers.clear();
         return futures;
     }
 

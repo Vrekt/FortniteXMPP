@@ -15,6 +15,7 @@ import me.vrekt.fortnitexmpp.party.PartyResource;
 import me.vrekt.fortnitexmpp.presence.DefaultPresenceResource;
 import me.vrekt.fortnitexmpp.presence.PresenceResource;
 import me.vrekt.fortnitexmpp.provider.FortniteXMPPConfiguration;
+import me.vrekt.fortnitexmpp.utility.Logging;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
@@ -122,6 +123,8 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
             final var hexId = RandomStringUtils.random(32, 0, 0, true, true, hex);
             final var resource = "V2:" + appType.getName() + ":" + platformType.name() + "::" + hexId;
 
+            Logging.logInfoIfApplicable(LOGGER.atInfo(), configuration.doEnableLogging(), "Resource ID is: " + resource);
+
             connection = new XMPPTCPConnection(XMPPTCPConnectionConfiguration.builder()
                     .setUsernameAndPassword(account.accountId(), accessToken)
                     .setXmppDomain(SERVICE_DOMAIN)
@@ -136,18 +139,26 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
             final var roster = Roster.getInstanceFor(connection);
             final var load = configuration.doLoadRoster();
 
-            if (!load) roster.setRosterLoadedAtLogin(false);
-            if (!load) roster.setSubscriptionMode(Roster.SubscriptionMode.manual);
+            if (!load) {
+                Logging.logInfoIfApplicable(LOGGER.atInfo(), configuration.doEnableLogging(), "Roster loading is off, using manual subscription mode and disabling loading at login.");
+                roster.setRosterLoadedAtLogin(false);
+                roster.setSubscriptionMode(Roster.SubscriptionMode.manual);
+            }
 
             connection.connect().login();
             connection.setReplyTimeout(120000);
             this.user = connection.getUser();
 
-            if (load) if (!roster.isLoaded()) roster.reloadAndWait();
+            if (load) {
+                if (!roster.isLoaded()) roster.reloadAndWait();
+                Logging.logInfoIfApplicable(LOGGER.atInfo(), configuration.doEnableLogging(), "Roster loaded.");
+            }
 
             // set the ping interval, makes a more stable connection.
             final var pingManager = PingManager.getInstanceFor(connection);
             pingManager.setPingInterval(60);
+            Logging.logInfoIfApplicable(LOGGER.atInfo(), configuration.doEnableLogging(), "Default ping interval is 60 seconds.");
+
             pingManager.registerPingFailedListener(() -> {
                 LOGGER.atSevere().log("Ping failed, attempting reconnect.");
                 if (!reconnecting.get()) renewAndReconnect();
@@ -160,18 +171,16 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
             }
 
             if (friendResource == null) {
-                friendResource = new DefaultFriendResource(this);
+                friendResource = new DefaultFriendResource(this, configuration.doEnableLogging());
             } else {
                 friendResource.reinitialize(this);
             }
-            friendResource.logExceptionsAndWarnings(configuration.doLogExceptions());
 
             if (partyResource == null) {
-                partyResource = new DefaultPartyResource(this);
+                partyResource = new DefaultPartyResource(this, configuration.doEnableLogging());
             } else {
                 partyResource.reinitialize(this);
             }
-            partyResource.logExceptionsAndWarnings(configuration.doLogExceptions());
 
             if (presenceResource == null) {
                 presenceResource = new DefaultPresenceResource(this);
@@ -251,7 +260,7 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
             this.fortnite = fortniteBuilder.build();
             connect();
         } catch (final IOException | XMPPAuthenticationException exception) {
-            LOGGER.atSevere().log("Failed to reconnect, retrying in  " + configuration.getReconnectionWaitTime() + " seconds.");
+            LOGGER.atSevere().withCause(exception).log("Failed to reconnect, retrying in  " + configuration.getReconnectionWaitTime() + " seconds.");
             CompletableFuture.delayedExecutor(configuration.getReconnectionWaitTime(), TimeUnit.SECONDS).execute(this::renewAndReconnect);
         }
     }
@@ -330,22 +339,25 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
     private final class ConnectionErrorListener implements ConnectionListener {
         @Override
         public void connected(XMPPConnection connection) {
-            //
+            if (configuration.doEnableLogging()) LOGGER.atInfo().log("Connection established");
         }
 
         @Override
         public void authenticated(XMPPConnection connection, boolean resumed) {
-            //
+            if (configuration.doEnableLogging()) LOGGER.atInfo().log("Connection authenticated, resumed? " + resumed);
         }
 
         @Override
         public void connectionClosed() {
-            //
+            if (configuration.doEnableLogging()) LOGGER.atInfo().log("Connection closed");
         }
 
         @Override
         public void connectionClosedOnError(Exception exception) {
             exception.printStackTrace();
+
+            if (configuration.doEnableLogging())
+                LOGGER.atSevere().withCause(exception).log("Connection closed with error\nDo reconnect? " + configuration.doReconnectOnError());
 
             if (configuration.doReconnectOnError()) {
                 reconnecting.set(true);
