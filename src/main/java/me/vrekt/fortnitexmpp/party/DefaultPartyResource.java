@@ -140,9 +140,8 @@ public final class DefaultPartyResource implements PartyResource {
     }
 
     @Override
-    public void closeDirty() {
+    public void disposeConnection() {
         connection.removeAsyncStanzaListener(messageListener);
-        // clear parties list?
     }
 
     @Override

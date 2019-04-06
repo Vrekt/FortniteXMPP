@@ -95,7 +95,7 @@ public final class DefaultPresenceResource implements PresenceResource {
     }
 
     @Override
-    public void closeDirty() {
+    public void disposeConnection() {
         connection.removeAsyncStanzaListener(presenceListener);
     }
 

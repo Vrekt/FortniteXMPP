@@ -69,7 +69,7 @@ public final class DefaultChatResource implements ChatResource {
     }
 
     @Override
-    public void closeDirty() {
+    public void disposeConnection() {
         chatManager.removeIncomingListener(messageListener);
     }
 

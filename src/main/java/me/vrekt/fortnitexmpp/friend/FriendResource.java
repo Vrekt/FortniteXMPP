@@ -29,7 +29,7 @@ public interface FriendResource extends AutoCloseable {
     /**
      * Removes stanza listeners but does not clear internal listeners.
      */
-    void closeDirty();
+    void disposeConnection();
 
     /**
      * Reinitialize this resource for the new connect.

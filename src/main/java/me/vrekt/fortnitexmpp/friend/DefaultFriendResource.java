@@ -66,7 +66,7 @@ public final class DefaultFriendResource implements FriendResource {
     }
 
     @Override
-    public void closeDirty() {
+    public void disposeConnection() {
         connection.removeAsyncStanzaListener(messageListener);
     }
 
