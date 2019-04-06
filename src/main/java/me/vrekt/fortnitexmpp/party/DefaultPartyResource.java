@@ -22,6 +22,7 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jxmpp.jid.Jid;
+import org.jxmpp.jid.impl.JidCreate;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -196,11 +197,19 @@ public final class DefaultPartyResource implements PartyResource {
                 var party = parties.get(partyId.get());
                 if (party != null && accessKey.isPresent() && !party.accessKey().equals(accessKey.get())) {
                     party = Party.fromPayload(payload);
+
+                    // update party leader
+                    final var accountId = from.getLocalpartOrNull().asUnescapedString();
+                    party.updatePartyLeaderId(accountId, from);
                     parties.put(partyId.get(), party);
                 }
 
                 if (party == null) {
                     party = Party.fromPayload(payload);
+
+                    // update party leader
+                    final var accountId = from.getLocalpartOrNull().asUnescapedString();
+                    party.updatePartyLeaderId(accountId, from);
                     parties.put(partyId.get(), party);
                 }
 
@@ -208,7 +217,7 @@ public final class DefaultPartyResource implements PartyResource {
                 updatePartyBasedOnType(party, type, payload, from);
                 invokeListeners(party, type, payload, from);
             } catch (final Exception exception) {
-                if (log) LOGGER.atWarning().log("Failed to parse message party JSON, cause: " + exception.getMessage());
+                if (log) LOGGER.atWarning().withCause(exception).log("Failed to parse party message.");
             }
         }
     }
@@ -282,6 +291,15 @@ public final class DefaultPartyResource implements PartyResource {
             }
 
             party.updateConfiguration(new PartyConfiguration(invitePermissions.get(), partyFlags.get(), notAcceptingMembersReason.get(), maxMembers.get(), presencePermissions.get()));
+        } else if (type == PartyType.PARTY_MEMBER_PROMOTED) {
+            // member was promoted, change the party leader
+            final var newLeaderId = JsonUtility.getString("promotedMemberUserId", payload);
+            if (newLeaderId.isEmpty()) {
+                logMalformedType(type, payload, from);
+                return;
+            }
+            final var newJid = JidCreate.bareFromOrThrowUnchecked(newLeaderId + "@" + FortniteXMPP.SERVICE_DOMAIN);
+            party.updatePartyLeaderId(newLeaderId.get(), newJid);
         }
     }
 

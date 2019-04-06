@@ -7,6 +7,7 @@ import me.vrekt.fortnitexmpp.party.implementation.request.configuration.PartyUpd
 import me.vrekt.fortnitexmpp.party.implementation.request.data.PartyData;
 import me.vrekt.fortnitexmpp.utility.JsonUtility;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.jxmpp.jid.Jid;
 
 import javax.json.JsonObject;
 import java.util.List;
@@ -23,6 +24,8 @@ public final class DefaultParty implements Party {
     private final String partyId, accessKey;
 
     private PartyConfiguration configuration;
+    private String partyLeaderId;
+    private Jid partyLeaderJid;
 
     /**
      * Creates a new {@link Party} from the provided configuration.
@@ -64,6 +67,22 @@ public final class DefaultParty implements Party {
     @Override
     public List<PartyMember> members() {
         return members;
+    }
+
+    @Override
+    public String partyLeaderId() {
+        return partyLeaderId;
+    }
+
+    @Override
+    public Jid partyLeaderJid() {
+        return partyLeaderJid;
+    }
+
+    @Override
+    public void updatePartyLeaderId(String accountId, Jid from) {
+        this.partyLeaderId = accountId;
+        this.partyLeaderJid = from;
     }
 
     @Override

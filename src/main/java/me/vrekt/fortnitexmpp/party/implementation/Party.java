@@ -3,6 +3,7 @@ package me.vrekt.fortnitexmpp.party.implementation;
 import me.vrekt.fortnitexmpp.party.PartyResource;
 import me.vrekt.fortnitexmpp.party.implementation.configuration.PartyConfiguration;
 import me.vrekt.fortnitexmpp.party.implementation.member.PartyMember;
+import org.jxmpp.jid.Jid;
 
 import javax.json.JsonObject;
 import java.util.List;
@@ -46,6 +47,24 @@ public interface Party {
      * @return a set of members who are in this party.
      */
     List<PartyMember> members();
+
+    /**
+     * @return the current party leader account ID.
+     */
+    String partyLeaderId();
+
+    /**
+     * @return the current party leader JID
+     */
+    Jid partyLeaderJid();
+
+    /**
+     * Update the current party leader
+     *
+     * @param accountId the account ID of the leader
+     * @param from      who its from
+     */
+    void updatePartyLeaderId(final String accountId, final Jid from);
 
     /**
      * Add a member to this party
