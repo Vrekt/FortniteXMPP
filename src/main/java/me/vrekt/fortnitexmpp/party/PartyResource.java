@@ -4,6 +4,7 @@ import me.vrekt.fortnitexmpp.FortniteXMPP;
 import me.vrekt.fortnitexmpp.party.implementation.Party;
 import me.vrekt.fortnitexmpp.party.implementation.listener.PartyListener;
 import me.vrekt.fortnitexmpp.party.implementation.member.PartyMember;
+import me.vrekt.fortnitexmpp.party.implementation.presence.PartyPresence;
 import me.vrekt.fortnitexmpp.party.implementation.request.PartyRequest;
 import org.jxmpp.jid.Jid;
 
@@ -88,6 +89,8 @@ public interface PartyResource extends AutoCloseable {
      * @param partyId the ID of the party
      */
     void removePartyById(final String partyId);
+
+    void setPartyPresence(PartyPresence presence);
 
     /**
      * Removes stanza listeners but does not clear internal listeners.

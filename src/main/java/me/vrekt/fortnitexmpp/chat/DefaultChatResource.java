@@ -82,7 +82,6 @@ public final class DefaultChatResource implements ChatResource {
     public void reinitialize(final FortniteXMPP fortniteXMPP) {
         chatManager = ChatManager.getInstanceFor(fortniteXMPP.connection());
         chatManager.addIncomingListener(messageListener);
-        LOGGER.atInfo().log("ChatResource re-initialized.");
     }
 
     /**

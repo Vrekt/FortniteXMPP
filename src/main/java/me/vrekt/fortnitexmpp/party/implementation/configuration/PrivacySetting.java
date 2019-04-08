@@ -43,6 +43,10 @@ public enum PrivacySetting {
         return notAcceptingMembersReason;
     }
 
+    public boolean isPublic() {
+        return this == PUBLIC || this == FRIENDS_ALLOW_FRIENDS_OF_FRIENDS;
+    }
+
     public static PrivacySetting typeOf(final int invitePermissions, final int partyFlags, final int notAcceptingMembersReason) {
         if (invitePermissions == 32515 && partyFlags == 7 && notAcceptingMembersReason == 0) return PrivacySetting.PUBLIC;
         if (invitePermissions == 32513 && partyFlags == 7 && notAcceptingMembersReason == 0) return PrivacySetting.FRIENDS;

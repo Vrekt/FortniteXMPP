@@ -6,7 +6,7 @@ package me.vrekt.fortnitexmpp.party.implementation.error;
  */
 public enum ErrorType {
 
-    NO_RESPONSE(-91), REQUESTEE_NOT_LEADER(-92), REQUESTEE_NOT_MEMBER(-93), QUERY_FAILED(0);
+    NO_RESPONSE(-91), REQUESTEE_NOT_LEADER(-92), REQUESTEE_NOT_MEMBER(-93), BAD_BUILD(-99), QUERY_FAILED(0);
 
     private final int code;
 

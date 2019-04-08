@@ -10,6 +10,7 @@ import me.vrekt.fortnitexmpp.party.implementation.data.ImmutablePartyData;
 import me.vrekt.fortnitexmpp.party.implementation.listener.PartyListener;
 import me.vrekt.fortnitexmpp.party.implementation.member.PartyMember;
 import me.vrekt.fortnitexmpp.party.implementation.member.data.ImmutablePartyMemberData;
+import me.vrekt.fortnitexmpp.party.implementation.presence.PartyPresence;
 import me.vrekt.fortnitexmpp.party.implementation.request.PartyRequest;
 import me.vrekt.fortnitexmpp.party.implementation.request.general.InvitationResponse;
 import me.vrekt.fortnitexmpp.party.type.PartyType;
@@ -20,6 +21,7 @@ import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.filter.StanzaTypeFilter;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jxmpp.jid.Jid;
@@ -43,6 +45,7 @@ public final class DefaultPartyResource implements PartyResource {
     private final Map<String, Party> parties = new ConcurrentHashMap<>();
     private final List<PartyListener> listeners = new CopyOnWriteArrayList<>();
     private final MessageListener messageListener = new MessageListener();
+    private FortniteXMPP fortniteXMPP;
     private XMPPTCPConnection connection;
 
     private boolean enableLogging;
@@ -53,9 +56,11 @@ public final class DefaultPartyResource implements PartyResource {
      * @param fortniteXMPP the {@link FortniteXMPP} instance
      */
     public DefaultPartyResource(final FortniteXMPP fortniteXMPP, final boolean enableLogging) {
+        this.fortniteXMPP = fortniteXMPP;
         this.connection = fortniteXMPP.connection();
         this.enableLogging = enableLogging;
         connection.addAsyncStanzaListener(messageListener, StanzaTypeFilter.MESSAGE);
+
     }
 
     @Override
@@ -84,12 +89,12 @@ public final class DefaultPartyResource implements PartyResource {
     }
 
     @Override
-    public boolean trySendRequestTo(PartyRequest request, Jid recipient) {
+    public boolean trySendRequestTo(final PartyRequest request, final Jid recipient) {
         return sendTo(request, recipient);
     }
 
     @Override
-    public boolean trySendRequestTo(PartyRequest request, Collection<Jid> recipients) {
+    public boolean trySendRequestTo(final PartyRequest request, final Collection<Jid> recipients) {
         final var failed = new AtomicBoolean(false);
         recipients.forEach(recipient -> {
             if (sendTo(request, recipient)) failed.set(true);
@@ -98,7 +103,7 @@ public final class DefaultPartyResource implements PartyResource {
     }
 
     @Override
-    public boolean trySendRequestTo(PartyRequest request, Iterable<PartyMember> members) {
+    public boolean trySendRequestTo(final PartyRequest request, final Iterable<PartyMember> members) {
         final var failed = new AtomicBoolean(false);
         members.forEach(recipient -> {
             if (sendTo(request, recipient.user())) failed.set(true);
@@ -120,7 +125,6 @@ public final class DefaultPartyResource implements PartyResource {
             message.setBody(request.payload());
             connection.sendStanza(message);
         } catch (final SmackException.NotConnectedException | InterruptedException exception) {
-            // TODO: Ignore log variable here. Maybe change later.
             LOGGER.atWarning().withCause(exception).log("Failed to send party request.");
             return true;
         }
@@ -128,13 +132,23 @@ public final class DefaultPartyResource implements PartyResource {
     }
 
     @Override
-    public Party getPartyById(String partyId) {
+    public Party getPartyById(final String partyId) {
         return parties.get(partyId);
     }
 
     @Override
-    public void removePartyById(String partyId) {
+    public void removePartyById(final String partyId) {
         parties.remove(partyId);
+    }
+
+    @Override
+    public void setPartyPresence(final PartyPresence presence) {
+        final var packet = new Presence(Presence.Type.available, presence.status(), 0, Presence.Mode.available);
+        try {
+            connection.sendStanza(packet);
+        } catch (final SmackException.NotConnectedException | InterruptedException exception) {
+            LOGGER.atWarning().withCause(exception).log("Failed to send party request.");
+        }
     }
 
     @Override
@@ -151,9 +165,9 @@ public final class DefaultPartyResource implements PartyResource {
 
     @Override
     public void reinitialize(final FortniteXMPP fortniteXMPP) {
+        this.fortniteXMPP = fortniteXMPP;
         this.connection = fortniteXMPP.connection();
         connection.addAsyncStanzaListener(messageListener, StanzaTypeFilter.MESSAGE);
-        LOGGER.atInfo().log("PartyResource re-initialized.");
     }
 
     /**

@@ -80,7 +80,6 @@ public final class DefaultFriendResource implements FriendResource {
         this.connection = fortniteXMPP.connection();
         this.fortniteXMPP = fortniteXMPP;
         connection.addAsyncStanzaListener(messageListener, StanzaTypeFilter.MESSAGE);
-        LOGGER.atInfo().log("FriendResource re-initialized.");
     }
 
     /**

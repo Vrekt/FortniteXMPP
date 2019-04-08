@@ -105,7 +105,6 @@ public final class DefaultPresenceResource implements PresenceResource {
     public void reinitialize(final FortniteXMPP fortniteXMPP) {
         this.roster = Roster.getInstanceFor(fortniteXMPP.connection());
         connection.addAsyncStanzaListener(presenceListener, StanzaTypeFilter.PRESENCE);
-        LOGGER.atInfo().log("PresenceResource re-initialized.");
     }
 
     /**

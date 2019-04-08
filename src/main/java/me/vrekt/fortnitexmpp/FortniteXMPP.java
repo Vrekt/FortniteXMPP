@@ -75,11 +75,6 @@ public interface FortniteXMPP {
     CompletableFuture<FortniteXMPP> connectAsync();
 
     /**
-     * @return {@code true} if a connection attempt is being made to the XMPP service.
-     */
-    boolean isReconnecting();
-
-    /**
      * Disconnects from the XMPP service and disposes of everything created.
      * This should always be called on shutdown or else your connection will be spammed
      * with packets next time you connect.
@@ -99,6 +94,13 @@ public interface FortniteXMPP {
      * @param consumer the consumer
      */
     void onConnected(final Consumer<Void> consumer);
+
+    /**
+     * Adds a connection error listeners, consumes {@code null} when the connection encounters a stream error and disconnects.
+     *
+     * @param consumer the consumer
+     */
+    void onConnectionError(final Consumer<Void> consumer);
 
     /**
      * @return the {@link Fortnite} instance created or provided.
