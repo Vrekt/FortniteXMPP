@@ -5,6 +5,9 @@ import me.vrekt.fortnitexmpp.party.implementation.Party;
 
 import javax.json.Json;
 
+/**
+ * https://github.com/Vrekt/FortniteXMPP/wiki/Presence-Payload
+ */
 public final class PublicPartyInGamePresence implements PartyPresence {
 
     private final String status;
@@ -18,7 +21,7 @@ public final class PublicPartyInGamePresence implements PartyPresence {
      * @param playing           the message to show in the presence.
      *                          for example if this was {@code "Battle Royale Lobby"} then it would show "Battle Royale Lobby - X / X"
      *                          or if this was  {@code "Playing Creative"} then it would show "Playing Creative - X / X"
-     * @param sessionId         the session ID of the current session
+     * @param sessionId         the session ID of the current session, this must be a valid session ID or 'join game' wont show!
      * @param sessionKey        the key for the session
      * @param playlist          the current playlist
      * @param playersAlive      how many players are alive

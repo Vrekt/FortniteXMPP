@@ -94,6 +94,8 @@ public final class DefaultPresenceResource implements PresenceResource {
         connection.removeAsyncStanzaListener(presenceListener);
         listeners.clear();
         handlers.clear();
+        connection = null;
+        roster = null;
     }
 
     @Override

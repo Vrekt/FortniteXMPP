@@ -4,6 +4,9 @@ import me.vrekt.fortnitexmpp.party.implementation.Party;
 
 import javax.json.Json;
 
+/**
+ * https://github.com/Vrekt/FortniteXMPP/wiki/Presence-Payload
+ */
 public final class PrivatePartyPresence implements PartyPresence {
 
     private final String status;
@@ -27,6 +30,6 @@ public final class PrivatePartyPresence implements PartyPresence {
 
     @Override
     public String status() {
-        return null;
+        return status;
     }
 }

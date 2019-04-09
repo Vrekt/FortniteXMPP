@@ -68,6 +68,8 @@ public final class DefaultFriendResource implements FriendResource {
     public void close() {
         connection.removeAsyncStanzaListener(messageListener);
         listeners.clear();
+        connection = null;
+        fortniteXMPP = null;
     }
 
     @Override

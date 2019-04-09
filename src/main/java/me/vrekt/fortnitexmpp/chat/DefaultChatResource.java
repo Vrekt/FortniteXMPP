@@ -71,6 +71,7 @@ public final class DefaultChatResource implements ChatResource {
     public void close() {
         chatManager.removeIncomingListener(messageListener);
         listeners.clear();
+        chatManager = null;
     }
 
     @Override

@@ -208,6 +208,11 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
 
         initializeOrDisposePings();
         connection.disconnect();
+
+        chatResource = null;
+        friendResource = null;
+        partyResource = null;
+        presenceResource = null;
     }
 
     /**

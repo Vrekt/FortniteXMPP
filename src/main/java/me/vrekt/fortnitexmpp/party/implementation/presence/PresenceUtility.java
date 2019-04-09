@@ -6,9 +6,21 @@ import me.vrekt.fortnitexmpp.party.implementation.Party;
 import javax.json.Json;
 import javax.json.JsonObjectBuilder;
 
-public final class PresenceUtility {
+/**
+ * A class used to build certain parts of presence.
+ */
+final class PresenceUtility {
 
-    public static JsonObjectBuilder createJoinInfoData(final Party party, final String accountId, final String displayName, final String platform) {
+    /**
+     * Creates join info data, which is for joining parties.
+     *
+     * @param party       the party
+     * @param accountId   the account id of who owns the party
+     * @param displayName the display name
+     * @param platform    the platform
+     * @return a new {@link JsonObjectBuilder}
+     */
+    static JsonObjectBuilder createJoinInfoData(final Party party, final String accountId, final String displayName, final String platform) {
         return Json.createObjectBuilder()
                 .add("sourceId", accountId)
                 .add("sourceDisplayName", displayName)
@@ -22,7 +34,12 @@ public final class PresenceUtility {
                 .add("notAcceptingReason", 0);
     }
 
-    public static JsonObjectBuilder createBasicProperties() {
+    /**
+     * Creates basic properties.
+     *
+     * @return a new {@link JsonObjectBuilder}
+     */
+    static JsonObjectBuilder createBasicProperties() {
         return Json.createObjectBuilder()
                 .add("FortBasicInfo_j", Json.createObjectBuilder()
                         .add("homeBaseRating", 1).build())

@@ -90,6 +90,11 @@ public interface PartyResource extends AutoCloseable {
      */
     void removePartyById(final String partyId);
 
+    /**
+     * Set your presence to the party
+     *
+     * @param presence the presence to use
+     */
     void setPartyPresence(PartyPresence presence);
 
     /**
@@ -103,9 +108,5 @@ public interface PartyResource extends AutoCloseable {
      * @param fortniteXMPP the {@link FortniteXMPP} instance
      */
     void reinitialize(final FortniteXMPP fortniteXMPP);
-
-    /**
-     * enables debug logging for this resource.
-     */
 
 }

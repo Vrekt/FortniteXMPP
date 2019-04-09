@@ -45,7 +45,6 @@ public final class DefaultPartyResource implements PartyResource {
     private final Map<String, Party> parties = new ConcurrentHashMap<>();
     private final List<PartyListener> listeners = new CopyOnWriteArrayList<>();
     private final MessageListener messageListener = new MessageListener();
-    private FortniteXMPP fortniteXMPP;
     private XMPPTCPConnection connection;
 
     private boolean enableLogging;
@@ -56,7 +55,6 @@ public final class DefaultPartyResource implements PartyResource {
      * @param fortniteXMPP the {@link FortniteXMPP} instance
      */
     public DefaultPartyResource(final FortniteXMPP fortniteXMPP, final boolean enableLogging) {
-        this.fortniteXMPP = fortniteXMPP;
         this.connection = fortniteXMPP.connection();
         this.enableLogging = enableLogging;
         connection.addAsyncStanzaListener(messageListener, StanzaTypeFilter.MESSAGE);
@@ -156,6 +154,7 @@ public final class DefaultPartyResource implements PartyResource {
         connection.removeAsyncStanzaListener(messageListener);
         listeners.clear();
         parties.clear();
+        connection = null;
     }
 
     @Override
@@ -165,7 +164,6 @@ public final class DefaultPartyResource implements PartyResource {
 
     @Override
     public void reinitialize(final FortniteXMPP fortniteXMPP) {
-        this.fortniteXMPP = fortniteXMPP;
         this.connection = fortniteXMPP.connection();
         connection.addAsyncStanzaListener(messageListener, StanzaTypeFilter.MESSAGE);
     }
