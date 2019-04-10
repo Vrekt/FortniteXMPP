@@ -18,7 +18,7 @@ public final class DefaultParty implements Party {
     /**
      * Build ID, updated with newer fortnite versions
      */
-    public static int buildId = 5311236;
+    public static int buildId = 5466044;
 
     private final List<PartyMember> members = new CopyOnWriteArrayList<>();
     private final String partyId, accessKey;

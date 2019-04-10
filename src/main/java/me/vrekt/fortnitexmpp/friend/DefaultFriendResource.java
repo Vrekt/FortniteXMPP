@@ -93,6 +93,9 @@ public final class DefaultFriendResource implements FriendResource {
             final var message = (Message) packet;
             if (message.getType() != Message.Type.normal) return;
 
+            // return here since we received something from ourself.
+            if (message.getFrom().getLocalpartOrNull().equals(connection.getUser().getLocalpart())) return;
+
             try {
                 final var reader = Json.createReader(new StringReader(message.getBody()));
                 final var data = reader.readObject();
@@ -143,7 +146,7 @@ public final class DefaultFriendResource implements FriendResource {
                 }
 
             } catch (final Exception exception) {
-                LOGGER.atWarning().log("Failed to parse message JSON. from: " + packet.getFrom().asUnescapedString());
+                LOGGER.atWarning().log("Failed to parse message JSON. from: " + packet.getFrom().asUnescapedString() + "\nPayload: " + message.getBody());
             }
         }
     }

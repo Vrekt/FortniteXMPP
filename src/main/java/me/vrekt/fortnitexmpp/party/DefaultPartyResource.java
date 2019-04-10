@@ -177,6 +177,9 @@ public final class DefaultPartyResource implements PartyResource {
             final var message = (Message) packet;
             if (message.getType() != Message.Type.normal) return;
 
+            // return here since we received something from ourself.
+            if (message.getFrom().getLocalpartOrNull().equals(connection.getUser().getLocalpart())) return;
+
             try {
                 final var reader = Json.createReader(new StringReader(message.getBody()));
                 final var data = reader.readObject();
@@ -196,9 +199,6 @@ public final class DefaultPartyResource implements PartyResource {
                 // update the build id
                 JsonUtility.getString("buildId", payload).ifPresent(buildId -> DefaultParty.buildId = Integer.valueOf(buildId));
                 JsonUtility.getString("buildid", payload).ifPresent(buildId -> DefaultParty.buildId = Integer.valueOf(buildId));
-
-                // return here since we received something from ourself.
-                if (message.getFrom().asEntityFullJidIfPossible().equals(connection.getUser())) return;
 
                 final var partyId = JsonUtility.getString("partyId", payload);
                 final var accessKey = JsonUtility.getString("accessKey", payload);
@@ -231,7 +231,7 @@ public final class DefaultPartyResource implements PartyResource {
                 updatePartyBasedOnType(party, type, payload, from);
                 invokeListeners(party, type, payload, from);
             } catch (final Exception exception) {
-                LOGGER.atWarning().withCause(exception).log("Failed to parse party message. from: " + packet.getFrom().asUnescapedString());
+                LOGGER.atWarning().withCause(exception).log("Failed to parse party message. from: " + packet.getFrom().asUnescapedString() + "\nPayload: " + message.getBody());
             }
         }
     }
