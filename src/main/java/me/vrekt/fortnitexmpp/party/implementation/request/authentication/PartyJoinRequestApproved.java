@@ -36,8 +36,8 @@ public final class PartyJoinRequestApproved implements PartyRequest {
                 .add("partyId", partyId)
                 .add("presencePermissions", configuration.presencePermissions())
                 .add("invitePermissions", configuration.invitePermissions())
-                .add("partyFlags", 3)
-                .add("notAcceptingMembersReason", 0)
+                .add("partyFlags", configuration.partyFlags())
+                .add("notAcceptingMembersReason", configuration.notAcceptingMembersReason())
                 .add("maxMembers", configuration.maxMembers())
                 .add("password", "")
                 .add("accessKey", accessKey);
