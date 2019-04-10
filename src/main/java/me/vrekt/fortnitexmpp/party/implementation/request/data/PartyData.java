@@ -1,5 +1,6 @@
 package me.vrekt.fortnitexmpp.party.implementation.request.data;
 
+import me.vrekt.fortnitexmpp.party.implementation.Party;
 import me.vrekt.fortnitexmpp.party.implementation.configuration.PartyConfiguration;
 import me.vrekt.fortnitexmpp.party.implementation.configuration.PrivacySetting;
 import me.vrekt.fortnitexmpp.party.implementation.playlist.StandardPlaylists;
@@ -8,6 +9,7 @@ import me.vrekt.fortnitexmpp.party.implementation.request.RequestBuilder;
 import me.vrekt.fortnitexmpp.party.type.PartyType;
 
 import javax.json.Json;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public final class PartyData implements PartyRequest {
 
@@ -21,8 +23,8 @@ public final class PartyData implements PartyRequest {
      * @param partyId         the ID of the party
      * @return a new {@link PartyData} instance
      */
-    public static PartyData createNewWithConfiguration(final PartyConfiguration configuration, final String currentPlaylist, final String partyId) {
-        return new PartyData(configuration, currentPlaylist, partyId);
+    public static PartyData createNewWithConfiguration(final PartyConfiguration configuration, final String currentPlaylist, final String partyId, final String accountId) {
+        return new PartyData(configuration, currentPlaylist, partyId, accountId);
     }
 
     /**
@@ -33,8 +35,8 @@ public final class PartyData implements PartyRequest {
      * @param partyId       the ID of the party
      * @return a new {@link PartyData} instance
      */
-    public static PartyData createNewWithConfiguration(final PartyConfiguration configuration, final StandardPlaylists playlist, final String partyId) {
-        return new PartyData(configuration, playlist.getName(), partyId);
+    public static PartyData createNewWithConfiguration(final PartyConfiguration configuration, final StandardPlaylists playlist, final String partyId, final String accountId) {
+        return new PartyData(configuration, playlist.getName(), partyId, accountId);
     }
 
     /**
@@ -70,6 +72,10 @@ public final class PartyData implements PartyRequest {
         return new PartyData(configuration, partyId);
     }
 
+    public static PartyData forRawSquadAssignment(final Party party) {
+        return new PartyData(party);
+    }
+
     /**
      * Initialize
      *
@@ -77,7 +83,7 @@ public final class PartyData implements PartyRequest {
      * @param partyId         the ID of the party
      * @param currentPlaylist the playlist
      */
-    private PartyData(final PartyConfiguration configuration, final String currentPlaylist, final String partyId) {
+    private PartyData(final PartyConfiguration configuration, final String currentPlaylist, final String partyId, final String accountId) {
         final var payload = Json.createObjectBuilder().add("Rev", RequestBuilder.getRevisionFor(PartyType.PARTY_DATA));
 
         // get the party type based on the configuration type.
@@ -110,12 +116,17 @@ public final class PartyData implements PartyRequest {
                                 .add("playlistName", currentPlaylist)
                                 .add("tournamentId", "")
                                 .add("eventWindowId", "")
+                                .add("regionId", "NAE") // TODO: Customizable?
                                 .build()).build())
                 .add("AllowJoinInProgress_b", false)
                 .add("LFGTime_s", "0001-01-01T00:00:00.000Z")
                 .add("AthenaSquadFill_b", false)
                 .add("PartyIsJoinedInProgress_b", false)
                 .add("GameSessionKey_s", "")
+                .add("RawSquadAssignments_j", Json.createObjectBuilder()
+                        .add("RawSquadAssignemnts", Json.createObjectBuilder()
+                                .add("memberId", accountId)
+                                .add("absoluteMemberIdx", 0).build()).build())
                 .add("PrivacySettings_j", Json.createObjectBuilder()
                         .add("PrivacySettings", Json.createObjectBuilder()
                                 .add("partyType", partType)
@@ -178,6 +189,26 @@ public final class PartyData implements PartyRequest {
                                 .add("partyInviteRestriction", partyInviteRestriction)
                                 .add("bOnlyLeaderFriendsCanJoin", partyInviteRestriction.equalsIgnoreCase("LeaderOnly")).build()).build());
         this.payload = RequestBuilder.buildRequestDoublePayload(partyId, payload.add("Attrs", attributes).build(), PartyType.PARTY_DATA).toString();
+    }
+
+    private PartyData(final Party party) {
+        final var payload = Json.createObjectBuilder();
+        final var attributes = Json.createObjectBuilder();
+        final var array = Json.createArrayBuilder();
+
+        final var index = new AtomicInteger(0);
+        party.members().forEach(member -> {
+            final var object = Json.createObjectBuilder()
+                    .add("memberId", member.accountId())
+                    .add("absoluteMemberIdx", index.get());
+            array.add(object.build());
+            index.incrementAndGet();
+        });
+
+        payload.add("Rev", RequestBuilder.getRevisionFor(PartyType.PARTY_DATA));
+        attributes.add("RawSquadAssignments_j", Json.createObjectBuilder()
+                .add("RawSquadAssignments", array.build()));
+        this.payload = RequestBuilder.buildRequestDoublePayload(party.partyId(), payload.add("Attrs", attributes).build(), PartyType.PARTY_DATA).toString();
     }
 
     @Override

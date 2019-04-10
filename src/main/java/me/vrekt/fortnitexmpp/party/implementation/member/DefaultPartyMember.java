@@ -1,6 +1,7 @@
 package me.vrekt.fortnitexmpp.party.implementation.member;
 
 import me.vrekt.fortnitexmpp.FortniteXMPP;
+import me.vrekt.fortnitexmpp.party.implementation.member.connection.ConnectionType;
 import me.vrekt.fortnitexmpp.party.implementation.member.data.ImmutablePartyMemberData;
 import me.vrekt.fortnitexmpp.utility.FindPlatformUtility;
 import me.vrekt.fortnitexmpp.utility.JsonUtility;
@@ -11,7 +12,7 @@ import javax.json.JsonObject;
 
 public final class DefaultPartyMember implements PartyMember {
 
-    private String accountId, resource, displayName;
+    private String accountId, resource, displayName, connectionType;
     private FortniteXMPP.PlatformType platform;
     private Jid jid;
 
@@ -27,6 +28,7 @@ public final class DefaultPartyMember implements PartyMember {
         JsonUtility.getString("userId", payload).ifPresent(userId -> accountId = userId);
         JsonUtility.getString("xmppResource", payload).ifPresent(xmppResource -> resource = xmppResource);
         JsonUtility.getString("displayName", payload).ifPresent(displayName -> this.displayName = displayName);
+        JsonUtility.getString("connectionType", payload).ifPresent(connectionType -> this.connectionType = connectionType);
 
         // attempt to get platform.
         platform = FindPlatformUtility.getPlatformForResource(resource);
@@ -36,15 +38,18 @@ public final class DefaultPartyMember implements PartyMember {
     /**
      * Initialize this member
      *
-     * @param accountId    the account ID
-     * @param resource     the XMPP resource. (eg. V2:Fortnite:WIN)
-     * @param displayName  the display name
-     * @param platformType the platform
+     * @param accountId      the account ID
+     * @param resource       the XMPP resource. (eg. V2:Fortnite:WIN)
+     * @param displayName    the display name
+     * @param platformType   the platform
+     * @param connectionType the connecion type to use
      */
-    DefaultPartyMember(final String accountId, final String resource, final String displayName, final FortniteXMPP.PlatformType platformType) {
+    DefaultPartyMember(final String accountId, final String resource, final String displayName,
+                       final FortniteXMPP.PlatformType platformType, final ConnectionType connectionType) {
         this.accountId = accountId;
         this.resource = resource;
         this.displayName = displayName;
+        this.connectionType = connectionType.getName();
 
         this.platform = platformType;
         this.jid = JidCreate.fromOrThrowUnchecked(accountId + "@" + FortniteXMPP.SERVICE_DOMAIN + "/" + resource);
@@ -73,6 +78,11 @@ public final class DefaultPartyMember implements PartyMember {
     @Override
     public String resource() {
         return resource;
+    }
+
+    @Override
+    public String connectionType() {
+        return connectionType;
     }
 
     @Override

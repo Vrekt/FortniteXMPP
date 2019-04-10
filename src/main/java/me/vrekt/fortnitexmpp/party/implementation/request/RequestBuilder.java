@@ -4,7 +4,7 @@ import me.vrekt.fortnitexmpp.party.type.PartyType;
 
 import javax.json.Json;
 import javax.json.JsonObject;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,7 +24,7 @@ public final class RequestBuilder {
         final var object = Json.createObjectBuilder();
         object.add("type", type.getName());
         object.add("payload", payload);
-        object.add("timestamp", LocalDateTime.now().toString());
+        object.add("timestamp", Instant.now().toString());
         return object.build();
     }
 
@@ -42,7 +42,7 @@ public final class RequestBuilder {
         final var object = Json.createObjectBuilder();
         object.add("type", type.getName());
         object.add("payload", Json.createObjectBuilder().add("partyId", partyId).add("payload", payload).build());
-        object.add("timestamp", LocalDateTime.now().toString());
+        object.add("timestamp", Instant.now().toString());
         return object.build();
     }
 

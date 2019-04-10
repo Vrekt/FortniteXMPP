@@ -9,6 +9,7 @@ import me.vrekt.fortnitexmpp.party.implementation.configuration.PrivacySetting;
 import me.vrekt.fortnitexmpp.party.implementation.data.ImmutablePartyData;
 import me.vrekt.fortnitexmpp.party.implementation.listener.PartyListener;
 import me.vrekt.fortnitexmpp.party.implementation.member.PartyMember;
+import me.vrekt.fortnitexmpp.party.implementation.member.connection.ConnectionType;
 import me.vrekt.fortnitexmpp.party.implementation.member.data.ImmutablePartyMemberData;
 import me.vrekt.fortnitexmpp.party.implementation.presence.PartyPresence;
 import me.vrekt.fortnitexmpp.party.implementation.request.PartyRequest;
@@ -361,17 +362,22 @@ public final class DefaultPartyResource implements PartyResource {
         } else if (type == PartyType.PARTY_JOIN_REQUEST) {
             final var accountId = from.getLocalpartOrNull();
             final var resource = from.getResourceOrNull();
-            if (accountId == null || resource == null) {
+
+            final var displayName = JsonUtility.getString("displayName", payload);
+            final var connectionType = JsonUtility.getString("connectionType", payload);
+            if (accountId == null || resource == null || displayName.isEmpty() || connectionType.isEmpty()) {
                 logMalformedType(type, payload, from);
                 return;
             }
 
-            // YIKES formatting
-            JsonUtility.getString("displayName", payload)
-                    .ifPresent(displayName -> listeners
-                            .forEach(listener -> listener.onJoinRequest(party, PartyMember
-                                    .newMember(accountId.asUnescapedString(), resource.toString(), displayName,
-                                            FindPlatformUtility.getPlatformForResource(resource.toString())), from)));
+            // 8.3
+            listeners.forEach(listener -> listener.onJoinRequest(party, PartyMember.newMember(
+                    accountId.asUnescapedString(),
+                    resource.toString(),
+                    displayName.get(),
+                    FindPlatformUtility.getPlatformForResource(resource.toString()),
+                    ConnectionType.getType(connectionType.get())), from));
+
             // request rejected
         } else if (type == PartyType.PARTY_JOIN_REQUEST_REJECTED) {
             listeners.forEach(listener -> listener.onJoinRequestRejected(party, from));

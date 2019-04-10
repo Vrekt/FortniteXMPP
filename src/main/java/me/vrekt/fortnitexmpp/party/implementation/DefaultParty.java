@@ -33,8 +33,9 @@ public final class DefaultParty implements Party {
      * @param configuration the configuration
      */
     DefaultParty(PartyConfiguration configuration) {
-        this.partyId = RandomStringUtils.randomAlphanumeric(32).toUpperCase();
-        this.accessKey = RandomStringUtils.randomAlphanumeric(32).toUpperCase();
+        final var hex = new char[]{'A', 'B', 'C', 'D', 'E', 'F', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+        this.partyId = RandomStringUtils.random(32, 0, 0, true, true, hex);
+        this.accessKey = RandomStringUtils.random(32, 0, 0, true, true, hex);
         this.configuration = configuration;
     }
 

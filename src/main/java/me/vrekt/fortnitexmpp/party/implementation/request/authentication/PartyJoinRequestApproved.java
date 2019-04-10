@@ -36,8 +36,8 @@ public final class PartyJoinRequestApproved implements PartyRequest {
                 .add("partyId", partyId)
                 .add("presencePermissions", configuration.presencePermissions())
                 .add("invitePermissions", configuration.invitePermissions())
-                .add("partyFlags", configuration.partyFlags())
-                .add("notAcceptingMembersReason", configuration.notAcceptingMembersReason())
+                .add("partyFlags", 3)
+                .add("notAcceptingMembersReason", 0)
                 .add("maxMembers", configuration.maxMembers())
                 .add("password", "")
                 .add("accessKey", accessKey);
@@ -47,6 +47,7 @@ public final class PartyJoinRequestApproved implements PartyRequest {
             m.add("userId", member.accountId());
             m.add("xmppResource", member.resource());
             m.add("displayName", member.displayName());
+            m.add("connectionType", member.connectionType());
             membersArray.add(m);
         });
 

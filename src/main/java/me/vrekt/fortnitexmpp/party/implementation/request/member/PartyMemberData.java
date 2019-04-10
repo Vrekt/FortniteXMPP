@@ -272,6 +272,15 @@ public final class PartyMemberData implements PartyRequest {
                 .add("HiddenMatchmakingDelayMax_U", "0")
                 .add("ReadyInputType_s", "Count")
                 .add("CurrentInputType_s", inputType.getName())
+                .add("AssistedChallengeInfo_j", Json.createObjectBuilder()
+                        .add("AssistedChallengeInfo", Json.createObjectBuilder()
+                                .add("questItemDef", "None")
+                                .add("objectivesCompleted", 0).build()).build())
+                .add("MemberSquadAssignmentRequest_j", Json.createObjectBuilder()
+                        .add("MemberSquadAssignmentRequest", Json.createObjectBuilder()
+                                .add("startingAbsoluteIdx", -1)
+                                .add("targetAbsoluteIdx", -1)
+                                .add("swapTargetMemberId", "INVALID").build()).build())
                 .add("AthenaCosmeticLoadout_j", Json.createObjectBuilder()
                         .add("AthenaCosmeticLoadout", cosmeticLoadout).build())
                 .add("AthenaBannerInfo_j", Json.createObjectBuilder()
@@ -365,7 +374,6 @@ public final class PartyMemberData implements PartyRequest {
         if (includeCharacter) {
             cosmeticLoadout.add("characterDefinition", "AthenaCharacterItemDefinition'/Game/Athena/Items/Cosmetics/Characters/" + skin + "." + skin + "'");
             cosmeticLoadout.add("characterDefinitionEncryptionKey", "");
-            cosmeticLoadout.add("cosmeticVariants", Json.createArrayBuilder().build());
         }
 
         if (includeBackbling) {
@@ -375,7 +383,6 @@ public final class PartyMemberData implements PartyRequest {
                 cosmeticLoadout.add("backpackDefinition", "AthenaBackpackItemDefinition'/Game/Athena/Items/Cosmetics/Backpacks/" + backbling + "." + backbling + "'");
             }
             cosmeticLoadout.add("backpackDefinitionEncryptionKey", "");
-            cosmeticLoadout.add("cosmeticVariants", Json.createArrayBuilder().build());
         }
         return cosmeticLoadout.build();
     }
