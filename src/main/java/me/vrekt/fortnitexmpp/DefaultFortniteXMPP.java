@@ -24,6 +24,7 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jivesoftware.smackx.ping.PingFailedListener;
 import org.jivesoftware.smackx.ping.PingManager;
 import org.jxmpp.jid.EntityFullJid;
 
@@ -48,6 +49,8 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
 
     // various listeners.
     private final ConnectionErrorListener errorListener = new ConnectionErrorListener();
+    private final PingFailedListener failedPingListener;
+
     private final List<Consumer<Void>> reconnectListeners = new ArrayList<>();
     private final List<Consumer<Void>> connectListeners = new ArrayList<>();
     private final List<Consumer<Void>> errorListeners = new ArrayList<>();
@@ -93,6 +96,10 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
         } catch (final IOException exception) {
             throw new FortniteAuthenticationException("Could not authenticate with Fortnite.", exception);
         }
+        failedPingListener = () -> {
+            LOGGER.atSevere().log("Ping failed, attempting reconnect.");
+            renewAndReconnect();
+        };
     }
 
     /**
@@ -118,6 +125,10 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
         } catch (final IOException exception) {
             throw new FortniteAuthenticationException("Could not authenticate with Fortnite.", exception);
         }
+        failedPingListener = () -> {
+            LOGGER.atSevere().log("Ping failed, attempting reconnect.");
+            renewAndReconnect();
+        };
     }
 
     @Override
@@ -161,7 +172,7 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
             // load roster
             loadRosterIfAppropriate();
             // register ping thread
-            initializeOrDisposePings();
+            initializeOrDisposePings(false);
 
             if (configuration.doKeepAlive()) keepConnectionAlive();
             connectListeners.forEach(consumer -> consumer.accept(null));
@@ -206,7 +217,7 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
         reconnectListeners.clear();
         connectListeners.clear();
 
-        initializeOrDisposePings();
+        initializeOrDisposePings(true);
         connection.disconnect();
 
         chatResource = null;
@@ -233,18 +244,17 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
     /**
      * Initializes or disposes of the ping manager.
      */
-    private void initializeOrDisposePings() {
-        if (pingManager == null) {
+    private void initializeOrDisposePings(final boolean dispose) {
+
+        if (dispose) {
+            pingManager.setPingInterval(-1);
+            pingManager.unregisterPingFailedListener(failedPingListener);
+            pingManager = null;
+        } else {
             pingManager = PingManager.getInstanceFor(connection);
             pingManager.setPingInterval(60);
 
-            pingManager.registerPingFailedListener(() -> {
-                LOGGER.atSevere().log("Ping failed, attempting reconnect.");
-                renewAndReconnect();
-            });
-        } else {
-            pingManager.setPingInterval(-1);
-            pingManager = null;
+            pingManager.registerPingFailedListener(failedPingListener);
         }
     }
 
@@ -296,6 +306,7 @@ public final class DefaultFortniteXMPP implements FortniteXMPP {
         reconnectListeners.forEach(consumer -> consumer.accept(null));
         LOGGER.atInfo().log("Attempting to reconnect to the XMPP service.");
         disconnectAndDispose();
+        initializeOrDisposePings(true);
 
         try {
             this.fortnite = fortniteBuilder.build();
