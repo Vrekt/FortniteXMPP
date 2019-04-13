@@ -2,6 +2,7 @@ package me.vrekt.fortnitexmpp.party.implementation.presence;
 
 import me.vrekt.fortnitexmpp.FortniteXMPP;
 import me.vrekt.fortnitexmpp.party.implementation.Party;
+import me.vrekt.fortnitexmpp.type.PlatformType;
 
 import javax.json.Json;
 
@@ -27,7 +28,7 @@ public final class PublicPartyInGamePresence implements PartyPresence {
      * @param playersAlive      how many players are alive
      * @param serverPlayerCount the server player count
      */
-    public PublicPartyInGamePresence(final FortniteXMPP fortniteXMPP, final Party party, final FortniteXMPP.PlatformType platformType,
+    public PublicPartyInGamePresence(final FortniteXMPP fortniteXMPP, final Party party, final PlatformType platformType,
                                      final String playing, final String sessionId, final String sessionKey, final String playlist,
                                      final int playersAlive, final int serverPlayerCount) {
         final var partyJoinInfoData = PresenceUtility.createJoinInfoData(party, fortniteXMPP.accountId(), fortniteXMPP.displayName(), platformType.name());

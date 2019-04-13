@@ -5,6 +5,8 @@ import io.github.robertograham.fortnite2.implementation.DefaultFortnite;
 import me.vrekt.fortnitexmpp.FortniteXMPP;
 import me.vrekt.fortnitexmpp.exception.FortniteAuthenticationException;
 import me.vrekt.fortnitexmpp.exception.XMPPAuthenticationException;
+import me.vrekt.fortnitexmpp.type.AppType;
+import me.vrekt.fortnitexmpp.type.PlatformType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,8 +39,8 @@ public final class MultipleAccountsProvider {
      * @return the current instance
      */
     public MultipleAccountsProvider addOneAccount(final FortniteXMPPConfiguration configuration,
-                                                  final FortniteXMPP.AppType appType,
-                                                  final FortniteXMPP.PlatformType platformType,
+                                                  final AppType appType,
+                                                  final PlatformType platformType,
                                                   final String emailAddress, final String password) {
         providers.add(new AccountProvider(configuration, DefaultFortnite.Builder.newInstance(emailAddress, password), appType, platformType));
         return this;
@@ -54,8 +56,8 @@ public final class MultipleAccountsProvider {
      * @return the current instance
      */
     public MultipleAccountsProvider addOneAccount(final FortniteXMPPConfiguration configuration,
-                                                  final FortniteXMPP.AppType appType,
-                                                  final FortniteXMPP.PlatformType platformType,
+                                                  final AppType appType,
+                                                  final PlatformType platformType,
                                                   final DefaultFortnite.Builder builder) {
         providers.add(new AccountProvider(configuration, builder, appType, platformType));
         return this;
@@ -75,8 +77,8 @@ public final class MultipleAccountsProvider {
      * @return the current instance
      */
     public MultipleAccountsProvider addManyAccounts(final FortniteXMPPConfiguration configuration,
-                                                    final FortniteXMPP.AppType appType,
-                                                    final FortniteXMPP.PlatformType platformType,
+                                                    final AppType appType,
+                                                    final PlatformType platformType,
                                                     final String... credentials) {
         for (int i = 0; i <= credentials.length; i += 2) {
             if (i + 1 > credentials.length - 1) break;
@@ -95,8 +97,8 @@ public final class MultipleAccountsProvider {
      * @return the current instance
      */
     public MultipleAccountsProvider addManyAccounts(final FortniteXMPPConfiguration configuration,
-                                                    final FortniteXMPP.AppType appType,
-                                                    final FortniteXMPP.PlatformType platformType,
+                                                    final AppType appType,
+                                                    final PlatformType platformType,
                                                     final DefaultFortnite.Builder... credentials) {
         for (DefaultFortnite.Builder credential : credentials) providers.add(new AccountProvider(configuration, credential, appType, platformType));
         return this;
@@ -229,13 +231,13 @@ public final class MultipleAccountsProvider {
     private final class AccountProvider {
         private final FortniteXMPPConfiguration configuration;
         private final DefaultFortnite.Builder builderInstance;
-        private final FortniteXMPP.AppType appType;
-        private final FortniteXMPP.PlatformType platformType;
+        private final AppType appType;
+        private final PlatformType platformType;
 
         AccountProvider(final FortniteXMPPConfiguration configuration,
                         final DefaultFortnite.Builder builderInstance,
-                        final FortniteXMPP.AppType appType,
-                        final FortniteXMPP.PlatformType platformType) {
+                        final AppType appType,
+                        final PlatformType platformType) {
             this.configuration = configuration;
             this.builderInstance = builderInstance;
             this.appType = appType;

@@ -88,13 +88,9 @@ public final class DefaultParty implements Party {
 
     @Override
     public void addMember(PartyMember member) {
-        try {
-            // check if this member already exists.
-            if (members.stream().anyMatch(member1 -> member1.accountId().equals(member.accountId()))) return;
-            members.add(member);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // check if this member already exists.
+        if (members.stream().anyMatch(member1 -> member1.accountId().equals(member.accountId()))) return;
+        members.add(member);
     }
 
     @Override

@@ -3,6 +3,7 @@ package me.vrekt.fortnitexmpp.party.implementation.member;
 import me.vrekt.fortnitexmpp.FortniteXMPP;
 import me.vrekt.fortnitexmpp.party.implementation.member.connection.ConnectionType;
 import me.vrekt.fortnitexmpp.party.implementation.member.data.ImmutablePartyMemberData;
+import me.vrekt.fortnitexmpp.type.PlatformType;
 import me.vrekt.fortnitexmpp.utility.FindPlatformUtility;
 import me.vrekt.fortnitexmpp.utility.JsonUtility;
 import org.jxmpp.jid.Jid;
@@ -13,7 +14,7 @@ import javax.json.JsonObject;
 public final class DefaultPartyMember implements PartyMember {
 
     private String accountId, resource, displayName, connectionType;
-    private FortniteXMPP.PlatformType platform;
+    private PlatformType platform;
     private Jid jid;
 
     private ImmutablePartyMemberData data;
@@ -45,7 +46,7 @@ public final class DefaultPartyMember implements PartyMember {
      * @param connectionType the connecion type to use
      */
     DefaultPartyMember(final String accountId, final String resource, final String displayName,
-                       final FortniteXMPP.PlatformType platformType, final ConnectionType connectionType) {
+                       final PlatformType platformType, final ConnectionType connectionType) {
         this.accountId = accountId;
         this.resource = resource;
         this.displayName = displayName;
@@ -71,7 +72,7 @@ public final class DefaultPartyMember implements PartyMember {
      * @return the platform or {@code null} if no platform could be found.
      */
     @Override
-    public FortniteXMPP.PlatformType platform() {
+    public PlatformType platform() {
         return platform;
     }
 

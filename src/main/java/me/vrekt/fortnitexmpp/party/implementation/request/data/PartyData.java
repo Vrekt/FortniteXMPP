@@ -73,6 +73,12 @@ public final class PartyData implements PartyRequest {
         return new PartyData(configuration, partyId);
     }
 
+    /**
+     * Creates the squad assignment data used for determining which spot a player should go.
+     *
+     * @param party the party
+     * @return a new {@link PartyData} instance
+     */
     public static PartyData forRawSquadAssignment(final Party party) {
         return new PartyData(party);
     }

@@ -9,6 +9,8 @@ import me.vrekt.fortnitexmpp.friend.FriendResource;
 import me.vrekt.fortnitexmpp.party.PartyResource;
 import me.vrekt.fortnitexmpp.presence.PresenceResource;
 import me.vrekt.fortnitexmpp.provider.FortniteXMPPConfiguration;
+import me.vrekt.fortnitexmpp.type.AppType;
+import me.vrekt.fortnitexmpp.type.PlatformType;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jxmpp.jid.EntityFullJid;
 
@@ -146,29 +148,5 @@ public interface FortniteXMPP {
      * @return the internal {@link PresenceResource} instance used for presence related actions.
      */
     PresenceResource presence();
-
-    /**
-     * Valid types for the XMPP service.
-     */
-    enum AppType {
-        FORTNITE("Fortnite"), LAUNCHER("launcher");
-
-        private final String name;
-
-        AppType(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-    }
-
-    /**
-     * Valid platforms Fortnite can be played on.
-     */
-    enum PlatformType {
-        WIN, MAC, IOS, AND, PSN, XBL, SWT
-    }
 
 }

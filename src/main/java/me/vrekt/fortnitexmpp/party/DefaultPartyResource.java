@@ -117,6 +117,10 @@ public final class DefaultPartyResource implements PartyResource {
      * @param recipient the recipient
      */
     private boolean sendTo(final PartyRequest request, final Jid recipient) {
+        if (request == null) {
+            LOGGER.atWarning().log("Request was null! Did you forget to build it?");
+            return true;
+        }
         Logging.logInfoIfApplicable(LOGGER.atInfo(), enableLogging, "Sending request to: " + recipient.asUnescapedString() + "\nWith payload: " + request.payload());
 
         try {

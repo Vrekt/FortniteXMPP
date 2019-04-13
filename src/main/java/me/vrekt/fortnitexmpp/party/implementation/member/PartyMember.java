@@ -1,8 +1,8 @@
 package me.vrekt.fortnitexmpp.party.implementation.member;
 
-import me.vrekt.fortnitexmpp.FortniteXMPP;
 import me.vrekt.fortnitexmpp.party.implementation.member.connection.ConnectionType;
 import me.vrekt.fortnitexmpp.party.implementation.member.data.ImmutablePartyMemberData;
+import me.vrekt.fortnitexmpp.type.PlatformType;
 import org.jxmpp.jid.Jid;
 
 import javax.json.JsonObject;
@@ -30,7 +30,7 @@ public interface PartyMember {
      * @return a new {@link PartyMember}
      */
     static PartyMember newMember(final String accountId, final String resource, final String displayName,
-                                 final FortniteXMPP.PlatformType platformType, final ConnectionType connectionType) {
+                                 final PlatformType platformType, final ConnectionType connectionType) {
         return new DefaultPartyMember(accountId, resource, displayName, platformType, connectionType);
     }
 
@@ -47,7 +47,7 @@ public interface PartyMember {
     /**
      * @return the current platform this {@link PartyMember} is on.
      */
-    FortniteXMPP.PlatformType platform();
+    PlatformType platform();
 
     /**
      * @return the XMPP resource of this {@link PartyMember}

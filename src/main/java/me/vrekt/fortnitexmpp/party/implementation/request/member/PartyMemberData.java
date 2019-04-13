@@ -1,258 +1,141 @@
 package me.vrekt.fortnitexmpp.party.implementation.request.member;
 
-import me.vrekt.fortnitexmpp.FortniteXMPP;
 import me.vrekt.fortnitexmpp.party.implementation.member.battlepass.BattlePass;
 import me.vrekt.fortnitexmpp.party.implementation.member.cosmetic.Backbling;
 import me.vrekt.fortnitexmpp.party.implementation.member.cosmetic.Skin;
 import me.vrekt.fortnitexmpp.party.implementation.member.input.InputType;
 import me.vrekt.fortnitexmpp.party.implementation.request.PartyRequest;
 import me.vrekt.fortnitexmpp.party.implementation.request.RequestBuilder;
+import me.vrekt.fortnitexmpp.party.implementation.request.member.status.PartyMemberStatus;
 import me.vrekt.fortnitexmpp.party.type.PartyType;
+import me.vrekt.fortnitexmpp.type.PlatformType;
 
 import javax.json.Json;
 import javax.json.JsonObject;
 
 public final class PartyMemberData implements PartyRequest {
 
-    private final JsonObject object;
-    private String payload;
+    private final String payload;
 
     /**
-     * Create a new {@link PartyMemberData} set for yourself.
+     * Create a new {@link PartyMemberData}
+     * This method initializes a full set of data, used for when you or somebody else joins the party!
      *
+     * @param partyId      the ID of the party of who this is going to
      * @param skin         the skin to use
-     * @param backbling    the backbling to use, or {@code "None"} for no backbling.
-     * @param inputType    the input type to use
-     * @param platformType the desired platform
-     * @return a new {@link PartyMemberData} instance
+     * @param backbling    the backbling to use, or {@code "None"}
+     * @param battlePass   the battle pass to use, or {@code null}
+     * @param inputType    the desired input type
+     * @param platformType the desired platform type
+     * @return a new {@link PartyMemberData}
      */
-    public static PartyMemberData forMyself(final String skin, final String backbling, final InputType inputType, final FortniteXMPP.PlatformType platformType) {
-        return new PartyMemberData(skin, backbling, inputType, null, platformType);
+    public static PartyMemberData create(final String partyId, final String skin, final String backbling,
+                                         final BattlePass battlePass, final InputType inputType, final PlatformType platformType) {
+        return new PartyMemberData(partyId, skin, backbling, battlePass, inputType, platformType);
     }
 
     /**
-     * Create a new {@link PartyMemberData} set for yourself.
+     * Create a new {@link PartyMemberData}
+     * This method initializes a full set of data, used for when you or somebody else joins the party!
      *
+     * @param partyId      the ID of the party of who this is going to
      * @param skin         the skin to use
-     * @param backbling    the backbling to use, or {@code "None"} for no backbling.
-     * @param inputType    the input type to use
-     * @param platformType the desired platform
-     * @return a new {@link PartyMemberData} instance
+     * @param backbling    the backbling to use, or {@code "None"}
+     * @param battlePass   the battle pass to use, or {@code null}
+     * @param inputType    the desired input type
+     * @param platformType the desired platform type
+     * @return a new {@link PartyMemberData}
      */
-    public static PartyMemberData forMyself(final Skin skin, final String backbling, final InputType inputType, final FortniteXMPP.PlatformType platformType) {
-        return new PartyMemberData(skin.name(), backbling, inputType, null, platformType);
+    public static PartyMemberData create(final String partyId, final Skin skin, final Backbling backbling,
+                                         final BattlePass battlePass, final InputType inputType, final PlatformType platformType) {
+        return new PartyMemberData(partyId, skin.name(), backbling.name(), battlePass, inputType, platformType);
     }
 
     /**
-     * Create a new {@link PartyMemberData} set for yourself.
+     * Creates a new {@link PartyMemberData} used to change the skin.
      *
+     * @param partyId the ID of the party of who this is going to
+     * @param skin    the skin to use
+     * @return a new {@link PartyMemberData}
+     */
+    public static PartyMemberData createToChangeSkin(final String partyId, final String skin) {
+        return new PartyMemberData(partyId, skin, null, true, false);
+    }
+
+    /**
+     * Creates a new {@link PartyMemberData} used to change the backbling
+     *
+     * @param partyId   the ID of the party of who this is going to
+     * @param backbling the backbling to use, or {@code "None"}
+     * @return a new {@link PartyMemberData}
+     */
+    public static PartyMemberData createToChangeBackbling(final String partyId, final String backbling) {
+        return new PartyMemberData(partyId, null, backbling, false, true);
+    }
+
+    /**
+     * Creates a new {@link PartyMemberData} used to change the skin.
+     *
+     * @param partyId the ID of the party of who this is going to
+     * @param skin    the skin to use
+     * @return a new {@link PartyMemberData}
+     */
+    public static PartyMemberData createToChangeSkin(final String partyId, final Skin skin) {
+        return new PartyMemberData(partyId, skin.name(), null, true, false);
+    }
+
+    /**
+     * Creates a new {@link PartyMemberData} used to change the backbling
+     *
+     * @param partyId   the ID of the party of who this is going to
+     * @param backbling the backbling to use, or {@code "None"}
+     * @return a new {@link PartyMemberData}
+     */
+    public static PartyMemberData createToChangeBackbling(final String partyId, final Backbling backbling) {
+        return new PartyMemberData(partyId, null, backbling.name(), false, true);
+    }
+
+    /**
+     * Creates a new {@link PartyMemberData} to change the status, eg: readying up.
+     *
+     * @param partyId   the ID of the party of who this is going to
+     * @param status    the desired status
+     * @param inputType the desired input type
+     * @return a new {@link PartyMemberData}
+     */
+    public static PartyMemberData createToSetStatus(final String partyId, final PartyMemberStatus status, final InputType inputType) {
+        return new PartyMemberData(partyId, status, inputType);
+    }
+
+    /**
+     * Creates a new {@link PartyMemberData} used to notify the party your content is preloaded.
+     *
+     * @param partyId the ID of the party of who this is going to
+     * @return a new {@link PartyMemberData}
+     */
+    public static PartyMemberData createToPreloadContent(final String partyId) {
+        return new PartyMemberData(partyId);
+    }
+
+    /**
+     * Initializes this instance
+     *
+     * @param partyId      the ID of the party of who this is going to
      * @param skin         the skin to use
-     * @param backbling    the backbling to use, or {@code "None"} for no backbling.
-     * @param inputType    the input type to use
-     * @param platformType the desired platform
-     * @return a new {@link PartyMemberData} instance
+     * @param backbling    the backbling to use, or {@code "None"}
+     * @param battlePass   the battle pass to use, or {@code null}
+     * @param inputType    the desired input type
+     * @param platformType the desired platform type
      */
-    public static PartyMemberData forMyself(final Skin skin, final Backbling backbling, final InputType inputType, final FortniteXMPP.PlatformType platformType) {
-        return new PartyMemberData(skin.name(), backbling.getName(), inputType, null, platformType);
-    }
-
-    /**
-     * Create a new {@link PartyMemberData} set for yourself.
-     *
-     * @param skin         the skin to use
-     * @param backbling    the backbling to use, or {@code "None"} for no backbling.
-     * @param battlePass   the battle pass to use.
-     * @param inputType    the input type to use
-     * @param platformType the desired platform
-     * @return a new {@link PartyMemberData} instance
-     */
-    public static PartyMemberData forMyself(final String skin, final String backbling, final BattlePass battlePass, final InputType inputType, final FortniteXMPP.PlatformType platformType) {
-        return new PartyMemberData(skin, backbling, inputType, battlePass, platformType);
-    }
-
-    /**
-     * Create a new {@link PartyMemberData} set for yourself.
-     *
-     * @param skin         the skin to use
-     * @param backbling    the backbling to use, or {@code "None"} for no backbling.
-     * @param battlePass   the battle pass to use.
-     * @param inputType    the input type to use
-     * @param platformType the desired platform
-     * @return a new {@link PartyMemberData} instance
-     */
-    public static PartyMemberData forMyself(final String skin, final Backbling backbling, final BattlePass battlePass, final InputType inputType, final FortniteXMPP.PlatformType platformType) {
-        return new PartyMemberData(skin, backbling.getName(), inputType, battlePass, platformType);
-    }
-
-    /**
-     * Create a new {@link PartyMemberData} set for yourself.
-     * This method is used for when you dealing with multiple parties and want to build your own set
-     * of data when required instead of storing it.
-     *
-     * @param skin         the skin to use
-     * @param backbling    the backbling to use, or {@code "None"} for no backbling.
-     * @param inputType    the input type to use
-     * @param platformType the desired platform
-     * @return a new {@link PartyMemberData} instance
-     */
-    public static PartyMemberData forMyselfOnce(final String skin, final String backbling, final InputType inputType, final FortniteXMPP.PlatformType platformType,
-                                                final String partyId) {
-        final var data = new PartyMemberData(skin, backbling, inputType, null, platformType);
-        data.setPartyIdAndBuild(partyId);
-        return data;
-    }
-
-    /**
-     * Create a new {@link PartyMemberData} set for yourself.
-     * This method is used for when you dealing with multiple parties and want to build your own set
-     * of data when required instead of storing it.
-     *
-     * @param skin         the skin to use
-     * @param backbling    the backbling to use, or {@code "None"} for no backbling.
-     * @param inputType    the input type to use
-     * @param platformType the desired platform
-     * @return a new {@link PartyMemberData} instance
-     */
-    public static PartyMemberData forMyselfOnce(final Skin skin, final String backbling, final InputType inputType, final FortniteXMPP.PlatformType platformType,
-                                                final String partyId) {
-        final var data = new PartyMemberData(skin.name(), backbling, inputType, null, platformType);
-        data.setPartyIdAndBuild(partyId);
-        return data;
-    }
-
-    /**
-     * Create a new {@link PartyMemberData} set for yourself.
-     * This method is used for when you dealing with multiple parties and want to build your own set
-     * of data when required instead of storing it.
-     *
-     * @param skin         the skin to use
-     * @param backbling    the backbling to use, or {@code "None"} for no backbling.
-     * @param inputType    the input type to use
-     * @param platformType the desired platform
-     * @return a new {@link PartyMemberData} instance
-     */
-    public static PartyMemberData forMyselfOnce(final Skin skin, final Backbling backbling, final InputType inputType, final FortniteXMPP.PlatformType platformType,
-                                                final String partyId) {
-        final var data = new PartyMemberData(skin.name(), backbling.getName(), inputType, null, platformType);
-        data.setPartyIdAndBuild(partyId);
-        return data;
-    }
-
-    /**
-     * Create a new {@link PartyMemberData} set for yourself.
-     * This method is used for when you dealing with multiple parties and want to build your own set
-     * of data when required instead of storing it.
-     *
-     * @param skin         the skin to use
-     * @param backbling    the backbling to use, or {@code "None"} for no backbling.
-     * @param battlePass   the battle pass to use.
-     * @param inputType    the input type to use
-     * @param platformType the desired platform
-     * @return a new {@link PartyMemberData} instance
-     */
-    public static PartyMemberData forMyselfOnce(final String skin, final String backbling, final BattlePass battlePass, final InputType inputType,
-                                                final FortniteXMPP.PlatformType platformType, final String partyId) {
-        final var data = new PartyMemberData(skin, backbling, inputType, battlePass, platformType);
-        data.setPartyIdAndBuild(partyId);
-        return data;
-    }
-
-    /**
-     * Create a new {@link PartyMemberData} set for yourself.
-     * This method is used for when you dealing with multiple parties and want to build your own set
-     * of data when required instead of storing it.
-     *
-     * @param skin         the skin to use
-     * @param backbling    the backbling to use, or {@code "None"} for no backbling.
-     * @param battlePass   the battle pass to use.
-     * @param inputType    the input type to use
-     * @param platformType the desired platform
-     * @return a new {@link PartyMemberData} instance
-     */
-    public static PartyMemberData forMyselfOnce(final String skin, final Backbling backbling, final BattlePass battlePass, final InputType inputType,
-                                                final FortniteXMPP.PlatformType platformType, final String partyId) {
-        final var data = new PartyMemberData(skin, backbling.getName(), inputType, battlePass, platformType);
-        data.setPartyIdAndBuild(partyId);
-        return data;
-    }
-
-
-    /**
-     * Create a new {@link PartyMemberData} with the provided {@code skin}
-     *
-     * @param skin the skin to use
-     * @return a new {@link PartyMemberData} instance
-     */
-    public static PartyMemberData forNewSkin(final String skin) {
-        return new PartyMemberData(skin, "None", true, false);
-    }
-
-    /**
-     * Create a new {@link PartyMemberData} with the provided {@code skin}
-     *
-     * @param skin the skin to use
-     * @return a new {@link PartyMemberData} instance
-     */
-    public static PartyMemberData forNewSkin(final Skin skin) {
-        return new PartyMemberData(skin.name(), "None", true, false);
-    }
-
-    /**
-     * Create a new {@link PartyMemberData} with the provided {@code backbling}
-     *
-     * @param backbling the backbling to use, this can be {@code "None"}
-     * @return a new {@link PartyMemberData} instance
-     */
-    public static PartyMemberData forNewBackbling(final String backbling) {
-        return new PartyMemberData("None", backbling, false, true);
-    }
-
-    /**
-     * Create a new {@link PartyMemberData} with the provided {@code backbling}
-     *
-     * @param backbling the backbling to use, this can be {@code "None"}
-     * @return a new {@link PartyMemberData} instance
-     */
-    public static PartyMemberData forNewBackbling(final Backbling backbling) {
-        return new PartyMemberData("None", backbling.getName(), false, true);
-    }
-
-    /**
-     * Create a new {@link PartyMemberData} with the provided {@code isReady} and {@code readyInputType}
-     *
-     * @param isReady        {@code} true if this character is ready.
-     * @param readyInputType the input type to use
-     * @return a new {@link PartyMemberData} instance
-     */
-    public static PartyMemberData forReadyStatus(final boolean isReady, final InputType readyInputType) {
-        return new PartyMemberData(isReady, readyInputType);
-    }
-
-    /**
-     * Create a new {@link PartyMemberData} with the provided {@code hasPreloaded}
-     *
-     * @param hasPreloaded {@code true} if this character has preloaded their in-game content.
-     * @return a new {@link PartyMemberData} instance.
-     */
-    public static PartyMemberData forPreloaded(final boolean hasPreloaded) {
-        return new PartyMemberData(hasPreloaded);
-    }
-
-    /**
-     * Initializes a full set of sendable data.
-     *
-     * @param skin      the skin to use, must always be set.
-     * @param backbling the backbling to use, or {@code "None"} for no backbling.
-     * @param inputType the desired input type.
-     */
-    private PartyMemberData(final String skin, final String backbling, final InputType inputType, final BattlePass battlePass, final FortniteXMPP.PlatformType platformType) {
+    private PartyMemberData(final String partyId, final String skin, final String backbling,
+                            final BattlePass battlePass, final InputType inputType, final PlatformType platformType) {
         // initialize battlepass info.
         final var hasPurchased = battlePass != null && battlePass.hasPurchased();
         final var friendBoostXp = battlePass == null ? 0 : battlePass.getFriendBoostXp();
         final var selfBoostXp = battlePass == null ? 0 : battlePass.getSelfBoostXp();
         final var level = battlePass == null ? 1 : battlePass.getPassLevel();
 
-        // hero and emote.
+        // build the hero definition and then the emote definition
         final var heroData = buildHeroDefinition(skin);
         final var frontendData = Json.createObjectBuilder()
                 .add("emoteItemDef", "None")
@@ -316,18 +199,19 @@ public final class PartyMemberData implements PartyRequest {
 
         payload.add("Rev", RequestBuilder.getRevisionFor(PartyType.PARTY_MEMBER_DATA));
         payload.add("Attrs", attributes.build());
-        this.object = payload.build();
+        this.payload = RequestBuilder.buildRequestDoublePayload(partyId, payload.build(), PartyType.PARTY_MEMBER_DATA).toString();
     }
 
     /**
      * Initialize for a skin or backbling change.
      *
+     * @param partyId          the ID of the party.
      * @param skin             the skin
      * @param backbling        the backbling
      * @param includeCharacter {@code true} if the skin definition should be included
      * @param includeBackbling {@code true} if the backpack definition should be included
      */
-    private PartyMemberData(final String skin, final String backbling, final boolean includeCharacter, final boolean includeBackbling) {
+    private PartyMemberData(final String partyId, final String skin, final String backbling, final boolean includeCharacter, final boolean includeBackbling) {
         final var cosmeticLoadout = buildCosmeticLoadout(skin, backbling, includeCharacter, includeBackbling);
         final var payload = Json.createObjectBuilder();
         final var attributes = Json.createObjectBuilder();
@@ -346,39 +230,43 @@ public final class PartyMemberData implements PartyRequest {
 
         payload.add("Rev", RequestBuilder.getRevisionFor(PartyType.PARTY_MEMBER_DATA));
         payload.add("Attrs", attributes.build());
-        this.object = payload.build();
+        this.payload = RequestBuilder.buildRequestDoublePayload(partyId, payload.build(), PartyType.PARTY_MEMBER_DATA).toString();
     }
 
     /**
      * Initialize to change the read status.
      *
-     * @param isReady   {@code true} if this character is ready
+     * @param partyId   the ID of the party.
+     * @param status    the status
      * @param inputType the desired input type
      */
-    private PartyMemberData(final boolean isReady, final InputType inputType) {
+    private PartyMemberData(final String partyId, final PartyMemberStatus status, final InputType inputType) {
         final var payload = Json.createObjectBuilder();
         final var attributes = Json.createObjectBuilder();
 
         payload.add("Rev", RequestBuilder.getRevisionFor(PartyType.PARTY_MEMBER_DATA));
-        attributes.add("GameReadiness_s", isReady ? "Ready" : "NotReady");
-        attributes.add("ReadyInputType_s", isReady ? inputType.getName() : "Count");
+        attributes.add("GameReadiness_s", status.getName());
+        if (status == PartyMemberStatus.READY || status == PartyMemberStatus.NOT_READY) {
+            attributes.add("ReadyInputType_s", status == PartyMemberStatus.READY ? inputType.getName() : "Count");
+        }
+
         payload.add("Attrs", attributes.build());
-        this.object = payload.build();
+        this.payload = RequestBuilder.buildRequestDoublePayload(partyId, payload.build(), PartyType.PARTY_MEMBER_DATA).toString();
     }
 
     /**
      * Initialize to change the preloaded status
      *
-     * @param hasPreloaded {@code true} if this character has preloaded their content
+     * @param partyId the ID of the party.
      */
-    private PartyMemberData(final boolean hasPreloaded) {
+    private PartyMemberData(final String partyId) {
         final var payload = Json.createObjectBuilder();
         final var attributes = Json.createObjectBuilder();
 
         payload.add("Rev", RequestBuilder.getRevisionFor(PartyType.PARTY_MEMBER_DATA));
-        attributes.add("HasPreloadedAthena_b", hasPreloaded);
+        attributes.add("HasPreloadedAthena_b", true);
         payload.add("Attrs", attributes.build());
-        this.object = payload.build();
+        this.payload = RequestBuilder.buildRequestDoublePayload(partyId, payload.build(), PartyType.PARTY_MEMBER_DATA).toString();
     }
 
     /**
@@ -419,15 +307,6 @@ public final class PartyMemberData implements PartyRequest {
         heroData.add("heroItemInstanceId", "");
         heroData.add("heroType", "FortHeroType'/Game/Athena/Heroes/" + heroName + "." + heroName + "'");
         return heroData.build();
-    }
-
-    /**
-     * Set the party ID and then build the JSON payload.
-     *
-     * @param partyId the ID of the party
-     */
-    public void setPartyIdAndBuild(final String partyId) {
-        this.payload = RequestBuilder.buildRequestDoublePayload(partyId, object, PartyType.PARTY_MEMBER_DATA).toString();
     }
 
     @Override

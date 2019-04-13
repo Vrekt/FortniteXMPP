@@ -2,6 +2,7 @@ package me.vrekt.fortnitexmpp.party.implementation.presence;
 
 import me.vrekt.fortnitexmpp.FortniteXMPP;
 import me.vrekt.fortnitexmpp.party.implementation.Party;
+import me.vrekt.fortnitexmpp.type.PlatformType;
 
 import javax.json.Json;
 
@@ -19,7 +20,7 @@ public final class PublicPartyPresence implements PartyPresence {
      * @param party        the party to use
      * @param platformType the platform type to use
      */
-    public PublicPartyPresence(final FortniteXMPP fortniteXMPP, final Party party, final FortniteXMPP.PlatformType platformType) {
+    public PublicPartyPresence(final FortniteXMPP fortniteXMPP, final Party party, final PlatformType platformType) {
         final var partyJoinInfoData = PresenceUtility.createJoinInfoData(party, fortniteXMPP.accountId(), fortniteXMPP.displayName(), platformType.name());
         final var basicProperties = PresenceUtility.createBasicProperties();
 

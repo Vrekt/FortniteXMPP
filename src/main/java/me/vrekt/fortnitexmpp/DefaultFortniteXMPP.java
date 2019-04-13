@@ -15,6 +15,8 @@ import me.vrekt.fortnitexmpp.party.PartyResource;
 import me.vrekt.fortnitexmpp.presence.DefaultPresenceResource;
 import me.vrekt.fortnitexmpp.presence.PresenceResource;
 import me.vrekt.fortnitexmpp.provider.FortniteXMPPConfiguration;
+import me.vrekt.fortnitexmpp.type.AppType;
+import me.vrekt.fortnitexmpp.type.PlatformType;
 import me.vrekt.fortnitexmpp.utility.Logging;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jivesoftware.smack.ConnectionListener;
