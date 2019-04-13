@@ -6,7 +6,7 @@ import me.vrekt.fortnitexmpp.party.implementation.member.PartyMember;
 import org.jxmpp.jid.Jid;
 
 import javax.json.JsonObject;
-import java.util.List;
+import java.util.Set;
 
 public interface Party {
 
@@ -46,7 +46,7 @@ public interface Party {
     /**
      * @return a set of members who are in this party.
      */
-    List<PartyMember> members();
+    Set<PartyMember> members();
 
     /**
      * @return the current party leader account ID.

@@ -10,8 +10,8 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.jxmpp.jid.Jid;
 
 import javax.json.JsonObject;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 public final class DefaultParty implements Party {
 
@@ -20,7 +20,7 @@ public final class DefaultParty implements Party {
      */
     public static int buildId = 5466044;
 
-    private final List<PartyMember> members = new CopyOnWriteArrayList<>();
+    private final Set<PartyMember> members = new CopyOnWriteArraySet<>();
     private final String partyId, accessKey;
 
     private PartyConfiguration configuration;
@@ -66,7 +66,7 @@ public final class DefaultParty implements Party {
     }
 
     @Override
-    public List<PartyMember> members() {
+    public Set<PartyMember> members() {
         return members;
     }
 
@@ -88,9 +88,13 @@ public final class DefaultParty implements Party {
 
     @Override
     public void addMember(PartyMember member) {
-        // check if this member already exists.
-        if (members.stream().anyMatch(member1 -> member1.accountId().equals(member.accountId()))) return;
-        members.add(member);
+        try {
+            // check if this member already exists.
+            if (members.stream().anyMatch(member1 -> member1.accountId().equals(member.accountId()))) return;
+            members.add(member);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

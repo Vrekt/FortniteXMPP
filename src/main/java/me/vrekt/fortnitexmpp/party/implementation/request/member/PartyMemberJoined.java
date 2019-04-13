@@ -21,13 +21,6 @@ public final class PartyMemberJoined implements PartyRequest {
      * @param displayName  the display name of the account
      */
     public PartyMemberJoined(final Party party, final String accountId, final String xmppResource, final String displayName) {
-
-        System.err.println(party == null);
-        System.err.println(party.partyId() == null);
-        System.err.println(accountId == null);
-        System.err.println(xmppResource == null);
-        System.err.println(displayName == null);
-
         final var payload = Json.createObjectBuilder()
                 .add("partyId", party.partyId())
                 .add("member", Json.createObjectBuilder()

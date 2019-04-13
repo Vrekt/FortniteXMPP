@@ -9,6 +9,7 @@ import me.vrekt.fortnitexmpp.party.implementation.request.RequestBuilder;
 import me.vrekt.fortnitexmpp.party.type.PartyType;
 
 import javax.json.Json;
+import javax.json.JsonArray;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class PartyData implements PartyRequest {
@@ -20,11 +21,11 @@ public final class PartyData implements PartyRequest {
      *
      * @param configuration   the current party configuration
      * @param currentPlaylist the desired playlist, {@see} {@link me.vrekt.fortnitexmpp.party.implementation.playlist.StandardPlaylists}
-     * @param partyId         the ID of the party
+     * @param party           the party
      * @return a new {@link PartyData} instance
      */
-    public static PartyData createNewWithConfiguration(final PartyConfiguration configuration, final String currentPlaylist, final String partyId, final String accountId) {
-        return new PartyData(configuration, currentPlaylist, partyId, accountId);
+    public static PartyData createNewWithConfiguration(final PartyConfiguration configuration, final String currentPlaylist, final Party party) {
+        return new PartyData(configuration, currentPlaylist, party);
     }
 
     /**
@@ -32,11 +33,11 @@ public final class PartyData implements PartyRequest {
      *
      * @param configuration the current party configuration
      * @param playlist      the desired playlist
-     * @param partyId       the ID of the party
+     * @param party         the party
      * @return a new {@link PartyData} instance
      */
-    public static PartyData createNewWithConfiguration(final PartyConfiguration configuration, final StandardPlaylists playlist, final String partyId, final String accountId) {
-        return new PartyData(configuration, playlist.getName(), partyId, accountId);
+    public static PartyData createNewWithConfiguration(final PartyConfiguration configuration, final StandardPlaylists playlist, final Party party) {
+        return new PartyData(configuration, playlist.getName(), party);
     }
 
     /**
@@ -80,10 +81,10 @@ public final class PartyData implements PartyRequest {
      * Initialize
      *
      * @param configuration   the configuration
-     * @param partyId         the ID of the party
+     * @param party           the party
      * @param currentPlaylist the playlist
      */
-    private PartyData(final PartyConfiguration configuration, final String currentPlaylist, final String partyId, final String accountId) {
+    private PartyData(final PartyConfiguration configuration, final String currentPlaylist, final Party party) {
         final var payload = Json.createObjectBuilder().add("Rev", RequestBuilder.getRevisionFor(PartyType.PARTY_DATA));
 
         // get the party type based on the configuration type.
@@ -96,6 +97,9 @@ public final class PartyData implements PartyRequest {
         final var partyInviteRestriction = configuration.settings() == PrivacySetting.FRIENDS_ALLOW_FRIENDS_OF_FRIENDS ? "AnyMember" :
                 configuration.settings() == PrivacySetting.PRIVATE_ALLOW_FRIENDS_OF_FRIENDS ? "AnyMember" : configuration.settings() == PrivacySetting.PUBLIC ? "AnyMember" :
                         "LeaderOnly";
+
+        final var indexes = fillMemberIndexes(party);
+
         final var attributes = Json.createObjectBuilder()
                 .add("PrimaryGameSessionId_s", "")
                 .add("PartyState_s", "BattleRoyaleView")
@@ -124,9 +128,7 @@ public final class PartyData implements PartyRequest {
                 .add("PartyIsJoinedInProgress_b", false)
                 .add("GameSessionKey_s", "")
                 .add("RawSquadAssignments_j", Json.createObjectBuilder()
-                        .add("RawSquadAssignemnts", Json.createObjectBuilder()
-                                .add("memberId", accountId)
-                                .add("absoluteMemberIdx", 0).build()).build())
+                        .add("RawSquadAssignments", indexes).build())
                 .add("PrivacySettings_j", Json.createObjectBuilder()
                         .add("PrivacySettings", Json.createObjectBuilder()
                                 .add("partyType", partType)
@@ -134,7 +136,7 @@ public final class PartyData implements PartyRequest {
                                 .add("bOnlyLeaderFriendsCanJoin", partyInviteRestriction.equalsIgnoreCase("LeaderOnly")).build()).build())
                 .add("PlatformSessions_j", Json.createObjectBuilder()
                         .add("PlatformSessions", Json.createArrayBuilder().build()).build()).build();
-        this.payload = RequestBuilder.buildRequestDoublePayload(partyId, payload.add("Attrs", attributes).build(), PartyType.PARTY_DATA).toString();
+        this.payload = RequestBuilder.buildRequestDoublePayload(party.partyId(), payload.add("Attrs", attributes).build(), PartyType.PARTY_DATA).toString();
     }
 
     /**
@@ -191,23 +193,38 @@ public final class PartyData implements PartyRequest {
         this.payload = RequestBuilder.buildRequestDoublePayload(partyId, payload.add("Attrs", attributes).build(), PartyType.PARTY_DATA).toString();
     }
 
+    private JsonArray fillMemberIndexes(final Party party) {
+        final var leader = party.partyLeaderId();
+        final var index = new AtomicInteger(leader == null ? 0 : 1);
+        final var array = Json.createArrayBuilder();
+
+        // add the leader first, should be always at index 0
+        if (leader != null) {
+            array.add(Json.createObjectBuilder()
+                    .add("memberId", leader)
+                    .add("absoluteMemberIdx", 0).build());
+        }
+
+        // next add all members
+        party.members().forEach(member -> {
+            if (!member.accountId().equals(leader)) {
+                final var object = Json.createObjectBuilder()
+                        .add("memberId", member.accountId())
+                        .add("absoluteMemberIdx", index.get());
+                array.add(object.build());
+                index.incrementAndGet();
+            }
+        });
+        return array.build();
+    }
+
     private PartyData(final Party party) {
         final var payload = Json.createObjectBuilder();
         final var attributes = Json.createObjectBuilder();
-        final var array = Json.createArrayBuilder();
-
-        final var index = new AtomicInteger(0);
-        party.members().forEach(member -> {
-            final var object = Json.createObjectBuilder()
-                    .add("memberId", member.accountId())
-                    .add("absoluteMemberIdx", index.get());
-            array.add(object.build());
-            index.incrementAndGet();
-        });
 
         payload.add("Rev", RequestBuilder.getRevisionFor(PartyType.PARTY_DATA));
         attributes.add("RawSquadAssignments_j", Json.createObjectBuilder()
-                .add("RawSquadAssignments", array.build()));
+                .add("RawSquadAssignments", fillMemberIndexes(party)));
         this.payload = RequestBuilder.buildRequestDoublePayload(party.partyId(), payload.add("Attrs", attributes).build(), PartyType.PARTY_DATA).toString();
     }
 

@@ -1,7 +1,6 @@
 package me.vrekt.fortnitexmpp.party.implementation.request.member;
 
 import me.vrekt.fortnitexmpp.FortniteXMPP;
-import me.vrekt.fortnitexmpp.party.implementation.Party;
 import me.vrekt.fortnitexmpp.party.implementation.member.battlepass.BattlePass;
 import me.vrekt.fortnitexmpp.party.implementation.member.cosmetic.Backbling;
 import me.vrekt.fortnitexmpp.party.implementation.member.cosmetic.Skin;
@@ -27,7 +26,7 @@ public final class PartyMemberData implements PartyRequest {
      * @param platformType the desired platform
      * @return a new {@link PartyMemberData} instance
      */
-    public static PartyMemberData forMyself(final Party party, final String skin, final String backbling, final InputType inputType, final FortniteXMPP.PlatformType platformType) {
+    public static PartyMemberData forMyself(final String skin, final String backbling, final InputType inputType, final FortniteXMPP.PlatformType platformType) {
         return new PartyMemberData(skin, backbling, inputType, null, platformType);
     }
 
@@ -40,7 +39,7 @@ public final class PartyMemberData implements PartyRequest {
      * @param platformType the desired platform
      * @return a new {@link PartyMemberData} instance
      */
-    public static PartyMemberData forMyself(final Party party, final Skin skin, final String backbling, final InputType inputType, final FortniteXMPP.PlatformType platformType) {
+    public static PartyMemberData forMyself(final Skin skin, final String backbling, final InputType inputType, final FortniteXMPP.PlatformType platformType) {
         return new PartyMemberData(skin.name(), backbling, inputType, null, platformType);
     }
 

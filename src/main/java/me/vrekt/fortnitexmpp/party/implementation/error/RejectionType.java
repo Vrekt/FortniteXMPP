@@ -6,7 +6,7 @@ package me.vrekt.fortnitexmpp.party.implementation.error;
  */
 public enum RejectionType {
 
-    NOT_A_MEMBER(-686087675), OTHER(-252);
+    NOT_A_MEMBER(-686087675), NOT_LEADER(4), OTHER(-252);
 
     private final int code;
 

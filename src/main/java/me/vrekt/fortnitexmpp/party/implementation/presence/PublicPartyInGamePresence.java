@@ -47,8 +47,6 @@ public final class PublicPartyInGamePresence implements PartyPresence {
                 .add("bHasVoiceSupport", false)
                 .add("SessionId", sessionId)
                 .add("Properties", properties.build()).build().toString();
-
-        System.err.println("ST: " + status);
     }
 
     @Override
