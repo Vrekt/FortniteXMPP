@@ -34,6 +34,20 @@ final class PresenceUtility {
                 .add("notAcceptingReason", 0);
     }
 
+    static JsonObjectBuilder createJoinInfo(final String partyId, final String accessKey, final String accountId, final String displayName, final String platform) {
+        return Json.createObjectBuilder()
+                .add("sourceId", accountId)
+                .add("sourceDisplayName", displayName)
+                .add("sourcePlatform", platform)
+                .add("partyId", partyId)
+                .add("partyTypeId", Party.TYPE_ID)
+                .add("key", accessKey)
+                .add("appId", "Fortnite")
+                .add("buildId", String.valueOf(DefaultParty.buildId))
+                .add("partyFlags", 6)
+                .add("notAcceptingReason", 0);
+    }
+
     /**
      * Creates basic properties.
      *

@@ -6,6 +6,7 @@ import me.vrekt.fortnitexmpp.party.implementation.listener.PartyListener;
 import me.vrekt.fortnitexmpp.party.implementation.member.PartyMember;
 import me.vrekt.fortnitexmpp.party.implementation.presence.PartyPresence;
 import me.vrekt.fortnitexmpp.party.implementation.request.PartyRequest;
+import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jxmpp.jid.Jid;
 
 import java.util.Collection;
@@ -96,6 +97,39 @@ public interface PartyResource extends AutoCloseable {
      * @param presence the presence to use
      */
     void setPartyPresence(PartyPresence presence);
+
+    /**
+     * Sends a message to the party
+     *
+     * @param message the message
+     * @return {@code true} if successful.
+     */
+    boolean sendMessageToParty(final Party party, final String message);
+
+    /**
+     * Sends a message to the party
+     *
+     * @param partyId the ID of the party
+     * @param message the message
+     * @return {@code true} if successful.
+     */
+    boolean sendMessageToParty(final String partyId, final String message);
+
+    /**
+     * Get the {@link MultiUserChat} for the party
+     *
+     * @param party the party
+     * @return the {@link MultiUserChat} or {@code null} if not found
+     */
+    MultiUserChat getChatForParty(final Party party);
+
+    /**
+     * Get the {@link MultiUserChat} for the party
+     *
+     * @param partyId the ID of the party
+     * @return the {@link MultiUserChat} or {@code null} if not found
+     */
+    MultiUserChat getChatForParty(final String partyId);
 
     /**
      * Removes stanza listeners but does not clear internal listeners.

@@ -25,8 +25,11 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jivesoftware.smackx.muc.MultiUserChatManager;
 import org.jxmpp.jid.Jid;
 import org.jxmpp.jid.impl.JidCreate;
+import org.jxmpp.jid.parts.Resourcepart;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -46,7 +49,11 @@ public final class DefaultPartyResource implements PartyResource {
     private final Map<String, Party> parties = new ConcurrentHashMap<>();
     private final List<PartyListener> listeners = new CopyOnWriteArrayList<>();
     private final MessageListener messageListener = new MessageListener();
+    private final String displayName, accountId;
+
     private XMPPTCPConnection connection;
+
+    private MultiUserChatManager manager;
 
     private boolean enableLogging;
 
@@ -57,9 +64,11 @@ public final class DefaultPartyResource implements PartyResource {
      */
     public DefaultPartyResource(final FortniteXMPP fortniteXMPP, final boolean enableLogging) {
         this.connection = fortniteXMPP.connection();
+        this.displayName = fortniteXMPP.displayName();
+        this.accountId = fortniteXMPP.accountId();
         this.enableLogging = enableLogging;
         connection.addAsyncStanzaListener(messageListener, StanzaTypeFilter.MESSAGE);
-
+        this.manager = MultiUserChatManager.getInstanceFor(connection);
     }
 
     @Override
@@ -155,6 +164,52 @@ public final class DefaultPartyResource implements PartyResource {
     }
 
     @Override
+    public boolean sendMessageToParty(final Party party, final String message) {
+        return sendPartyMessage(party.partyId(), message);
+    }
+
+    @Override
+    public boolean sendMessageToParty(String partyId, String message) {
+        return sendPartyMessage(partyId, message);
+    }
+
+    /**
+     * Sends a message to the party MUC.
+     *
+     * @param partyId the ID of the party
+     * @param message the message
+     * @return {@code true} if sending was successful
+     */
+    private boolean sendPartyMessage(final String partyId, final String message) {
+        try {
+            final var room = JidCreate.entityBareFromOrThrowUnchecked("Party-" + partyId + "@muc.prod.ol.epicgames.com");
+            final var chat = manager.getMultiUserChat(room);
+            try {
+                chat.createOrJoinIfNecessary(Resourcepart.from(displayName + ":" + connection.getUser().getResourceOrEmpty().toString()), "");
+                chat.sendMessage(message);
+            } catch (final Exception exception) {
+                LOGGER.atWarning().log("Failed to create or send a message to party: " + partyId);
+            }
+
+        } catch (final Exception exception) {
+            LOGGER.atWarning().withCause(exception).log("Failed to send message to party: " + partyId);
+        }
+        return false;
+    }
+
+    @Override
+    public MultiUserChat getChatForParty(final Party party) {
+        final var room = JidCreate.entityBareFromOrThrowUnchecked("Party-" + party.partyId() + "@muc.prod.ol.epicgames.com");
+        return manager.getMultiUserChat(room);
+    }
+
+    @Override
+    public MultiUserChat getChatForParty(final String partyId) {
+        final var room = JidCreate.entityBareFromOrThrowUnchecked("Party-" + partyId + "@muc.prod.ol.epicgames.com");
+        return manager.getMultiUserChat(room);
+    }
+
+    @Override
     public void close() {
         connection.removeAsyncStanzaListener(messageListener);
         listeners.clear();
@@ -165,12 +220,14 @@ public final class DefaultPartyResource implements PartyResource {
     @Override
     public void disposeConnection() {
         connection.removeAsyncStanzaListener(messageListener);
+
     }
 
     @Override
     public void reinitialize(final FortniteXMPP fortniteXMPP) {
         this.connection = fortniteXMPP.connection();
         connection.addAsyncStanzaListener(messageListener, StanzaTypeFilter.MESSAGE);
+        this.manager = MultiUserChatManager.getInstanceFor(connection);
     }
 
     /**
@@ -317,6 +374,7 @@ public final class DefaultPartyResource implements PartyResource {
                 logMalformedType(type, payload, from);
                 return;
             }
+
             final var newJid = JidCreate.bareFromOrThrowUnchecked(newLeaderId + "@" + FortniteXMPP.SERVICE_DOMAIN);
             party.updatePartyLeaderId(newLeaderId.get(), newJid);
         }
@@ -332,9 +390,11 @@ public final class DefaultPartyResource implements PartyResource {
      */
     private void invokeListeners(final Party party, final PartyType type, final JsonObject payload, final Jid from) {
         if (type == PartyType.PARTY_INVITATION) {
+            // an invitation
             listeners.forEach(listener -> listener.onInvitation(party, from));
-            // invitation response, not always sent. Really only sent with rejected responses.
         } else if (type == PartyType.PARTY_INVITATION_RESPONSE) {
+            // an invitation response, used for notifying whoever sent the invite what they did
+            // (accepted, rejected, etc)
             final var response = JsonUtility.getInt("response", payload);
             if (response.isEmpty()) {
                 logMalformedType(type, payload, from);
@@ -342,8 +402,8 @@ public final class DefaultPartyResource implements PartyResource {
             }
 
             listeners.forEach(listener -> listener.onInvitationResponse(party, response.get() == 1 ? InvitationResponse.ACCEPTED : InvitationResponse.REJECTED, from));
-            // query if the party is joinable.
         } else if (type == PartyType.PARTY_QUERY_JOINABILITY) {
+            // checks if the party is joinable, checks the cross play preference aswell
             final var joinData = JsonUtility.getObject("joinData", payload);
             final var attributes = JsonUtility.getObject("Attrs", joinData.orElse(null));
             final var crossplayPreference = JsonUtility.getInt("CrossplayPreference_i", attributes.orElse(null));
@@ -352,8 +412,9 @@ public final class DefaultPartyResource implements PartyResource {
                 return;
             }
             listeners.forEach(listener -> listener.onQueryJoinability(party, crossplayPreference.get(), from));
-            // the response if the party is joinable.
         } else if (type == PartyType.PARTY_QUERY_JOINABILITY_RESPONSE) {
+            // the response to a query, rejection types are mostly unknown
+            // but result param seems to be an account ID most of the time
             final var isJoinable = JsonUtility.getBoolean("isJoinable", payload);
             final var rejectionType = JsonUtility.getInt("rejectionType", payload);
             final var resultParam = JsonUtility.getString("resultParam", payload);
@@ -362,8 +423,8 @@ public final class DefaultPartyResource implements PartyResource {
                 return;
             }
             listeners.forEach(listener -> listener.onQueryJoinabilityResponse(party, isJoinable.get(), rejectionType.get(), resultParam.get(), from));
-            // join request
         } else if (type == PartyType.PARTY_JOIN_REQUEST) {
+            // a request to join the party
             final var accountId = from.getLocalpartOrNull();
             final var resource = from.getResourceOrNull();
 
@@ -385,13 +446,16 @@ public final class DefaultPartyResource implements PartyResource {
             // request rejected
         } else if (type == PartyType.PARTY_JOIN_REQUEST_REJECTED) {
             listeners.forEach(listener -> listener.onJoinRequestRejected(party, from));
-            // join request approved
         } else if (type == PartyType.PARTY_JOIN_REQUEST_APPROVED) {
+            // join request was approved, here is where the client will notify us
+            // of every member in the party, with this we can get that information and
+            // then add them to the party
             final var members = JsonUtility.getArray("members", payload);
             if (members.isEmpty()) {
                 logMalformedType(type, payload, from);
                 return;
             }
+
             final var array = members.get();
             final var set = new HashSet<PartyMember>();
             array.forEach(value -> set.add(PartyMember.newMember(value.asJsonObject())));

@@ -11,6 +11,8 @@ import org.jivesoftware.smack.packet.Message;
 import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.impl.JidCreate;
 
+import javax.json.Json;
+import java.io.StringReader;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -92,7 +94,15 @@ public final class DefaultChatResource implements ChatResource {
     private final class MessageListener implements IncomingChatMessageListener {
         @Override
         public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
-            listeners.forEach(listener -> listener.messageReceived(new me.vrekt.fortnitexmpp.chat.implementation.Message(from, message.getBody(), chat)));
+
+            // ignore friend/party messages
+            try {
+                final var reader = Json.createReader(new StringReader(message.getBody()));
+                reader.readObject();
+                reader.close();
+            } catch (final Exception exception) {
+                listeners.forEach(listener -> listener.messageReceived(new me.vrekt.fortnitexmpp.chat.implementation.Message(from, message.getBody(), chat)));
+            }
         }
     }
 

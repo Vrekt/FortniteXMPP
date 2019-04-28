@@ -3,6 +3,7 @@ package me.vrekt.fortnitexmpp.party.implementation.presence;
 import me.vrekt.fortnitexmpp.FortniteXMPP;
 import me.vrekt.fortnitexmpp.party.implementation.Party;
 import me.vrekt.fortnitexmpp.type.PlatformType;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import javax.json.Json;
 
@@ -28,21 +29,24 @@ public final class PublicPartyInGamePresence implements PartyPresence {
      * @param playersAlive      how many players are alive
      * @param serverPlayerCount the server player count
      */
-    public PublicPartyInGamePresence(final FortniteXMPP fortniteXMPP, final Party party, final PlatformType platformType,
+    public PublicPartyInGamePresence(final FortniteXMPP fortniteXMPP, final PlatformType platformType,
                                      final String playing, final String sessionId, final String sessionKey, final String playlist,
                                      final int playersAlive, final int serverPlayerCount) {
-        final var partyJoinInfoData = PresenceUtility.createJoinInfoData(party, fortniteXMPP.accountId(), fortniteXMPP.displayName(), platformType.name());
+        final var id = RandomStringUtils.randomAlphanumeric(32).toLowerCase();
+        final var key = RandomStringUtils.randomAlphanumeric(32).toUpperCase();
+
+        final var partyJoinInfoData = PresenceUtility.createJoinInfo(id, key, fortniteXMPP.accountId(), fortniteXMPP.displayName(), platformType.name());
         final var properties = PresenceUtility.createBasicProperties()
                 .add("GamePlaylistName_s", playlist)
                 .add("Event_PlayersAlive_s", String.valueOf(playersAlive))
-                .add("Event_PartySize_s", String.valueOf(party.members().size()))
-                .add("Event_PartyMaxSize_s", String.valueOf(party.configuration().maxMembers()))
+                .add("Event_PartySize_s", "1")
+                .add("Event_PartyMaxSize_s", "4")
                 .add(Party.PARTY_DATA_INFO, partyJoinInfoData.build())
                 .add("ServerPlayerCount_i", serverPlayerCount)
                 .add("GameSessionJoinKey_s", sessionKey);
 
         this.status = Json.createObjectBuilder()
-                .add("Status", playing + " - " + party.members().size() + " / " + party.configuration().maxMembers())
+                .add("Status", playing)
                 .add("bIsPlaying", true)
                 .add("bIsJoinable", true)
                 .add("bHasVoiceSupport", false)

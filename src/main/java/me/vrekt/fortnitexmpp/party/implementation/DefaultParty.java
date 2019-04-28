@@ -7,6 +7,7 @@ import me.vrekt.fortnitexmpp.party.implementation.request.configuration.PartyUpd
 import me.vrekt.fortnitexmpp.party.implementation.request.data.PartyData;
 import me.vrekt.fortnitexmpp.utility.JsonUtility;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jxmpp.jid.Jid;
 
 import javax.json.JsonObject;
@@ -26,6 +27,8 @@ public final class DefaultParty implements Party {
     private PartyConfiguration configuration;
     private String partyLeaderId;
     private Jid partyLeaderJid;
+
+    private MultiUserChat chat;
 
     /**
      * Creates a new {@link Party} from the provided configuration.
