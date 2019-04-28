@@ -182,10 +182,15 @@ public final class DefaultPartyResource implements PartyResource {
      */
     private boolean sendPartyMessage(final String partyId, final String message) {
         try {
-            final var room = JidCreate.entityBareFromOrThrowUnchecked("Party-" + partyId + "@muc.prod.ol.epicgames.com");
+            final var room = JidCreate.entityBareFromOrThrowUnchecked(
+                    "Party-" + partyId + "@muc.prod.ol.epicgames.com"
+            );
+            final var nick = Resourcepart.fromOrThrowUnchecked(
+                    displayName + ":" + accountId + ":" + connection.getUser().getResourceOrEmpty().toString()
+            );
             final var chat = manager.getMultiUserChat(room);
             try {
-                chat.createOrJoinIfNecessary(Resourcepart.from(displayName + ":" + connection.getUser().getResourceOrEmpty().toString()), "");
+                chat.join(nick);
                 chat.sendMessage(message);
             } catch (final Exception exception) {
                 LOGGER.atWarning().log("Failed to create or send a message to party: " + partyId);
