@@ -2,8 +2,7 @@ package me.vrekt.fortnitexmpp.chat;
 
 import me.vrekt.fortnitexmpp.FortniteXMPP;
 import me.vrekt.fortnitexmpp.chat.implementation.IncomingMessageListener;
-import org.jivesoftware.smack.chat2.ChatManager;
-import org.jxmpp.jid.EntityBareJid;
+import org.jxmpp.jid.Jid;
 
 public interface ChatResource extends AutoCloseable {
 
@@ -19,7 +18,7 @@ public interface ChatResource extends AutoCloseable {
      *
      * @param listener the listener
      */
-    boolean removeIncomingMessageListener(IncomingMessageListener listener);
+    boolean removeIncomingMessageListener(final IncomingMessageListener listener);
 
     /**
      * Attempts to send a message to the provided {@code accountId}
@@ -28,7 +27,7 @@ public interface ChatResource extends AutoCloseable {
      * @param message   the message to send
      * @return {@code true} if sending the message was successful.
      */
-    boolean sendMessage(String accountId, String message);
+    boolean sendMessage(final String accountId, final String message);
 
     /**
      * Attempts to send a message to the provided {@code EntityBareJid}
@@ -37,12 +36,7 @@ public interface ChatResource extends AutoCloseable {
      * @param message the message to send
      * @return {@code true} if sending the message was successful.
      */
-    boolean sendMessage(EntityBareJid user, String message);
-
-    /**
-     * @return the internal instance of {@link ChatManager}
-     */
-    ChatManager chatManager();
+    boolean sendMessage(final Jid user, final String message);
 
     /**
      * Removes stanza listeners but does not clear internal listeners.

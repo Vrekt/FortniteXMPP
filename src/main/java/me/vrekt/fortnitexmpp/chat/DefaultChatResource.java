@@ -4,15 +4,14 @@ import com.google.common.flogger.FluentLogger;
 import me.vrekt.fortnitexmpp.FortniteXMPP;
 import me.vrekt.fortnitexmpp.chat.implementation.IncomingMessageListener;
 import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.chat2.Chat;
-import org.jivesoftware.smack.chat2.ChatManager;
-import org.jivesoftware.smack.chat2.IncomingChatMessageListener;
+import org.jivesoftware.smack.StanzaListener;
+import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.packet.Message;
-import org.jxmpp.jid.EntityBareJid;
+import org.jivesoftware.smack.packet.Stanza;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+import org.jxmpp.jid.Jid;
 import org.jxmpp.jid.impl.JidCreate;
 
-import javax.json.Json;
-import java.io.StringReader;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -22,7 +21,8 @@ public final class DefaultChatResource implements ChatResource {
 
     private final List<IncomingMessageListener> listeners = new CopyOnWriteArrayList<>();
     private final MessageListener messageListener = new MessageListener();
-    private ChatManager chatManager;
+
+    private XMPPTCPConnection connection;
 
     /**
      * Initialize this resource.
@@ -30,8 +30,8 @@ public final class DefaultChatResource implements ChatResource {
      * @param fortniteXMPP the instance of {@link FortniteXMPP}
      */
     public DefaultChatResource(final FortniteXMPP fortniteXMPP) {
-        chatManager = ChatManager.getInstanceFor(fortniteXMPP.connection());
-        chatManager.addIncomingListener(messageListener);
+        this.connection = fortniteXMPP.connection();
+        connection.addAsyncStanzaListener(messageListener, MessageTypeFilter.CHAT);
     }
 
     @Override
@@ -53,11 +53,14 @@ public final class DefaultChatResource implements ChatResource {
     }
 
     @Override
-    public boolean sendMessage(final EntityBareJid user, final String message) {
+    public boolean sendMessage(final Jid user, final String message) {
         Objects.requireNonNull(user, "User cannot be null.");
         Objects.requireNonNull(message, "Message cannot be null.");
         try {
-            chatManager.chatWith(user).send(message);
+            final var packet = new Message(user, Message.Type.chat);
+            packet.setBody(message);
+
+            connection.sendStanza(packet);
         } catch (final SmackException.NotConnectedException | InterruptedException exception) {
             LOGGER.atWarning().withCause(exception).log("Failed to send message to: " + user.asUnescapedString());
         }
@@ -65,44 +68,32 @@ public final class DefaultChatResource implements ChatResource {
     }
 
     @Override
-    public ChatManager chatManager() {
-        return chatManager;
-    }
-
-    @Override
     public void close() {
-        chatManager.removeIncomingListener(messageListener);
+        connection.removeAsyncStanzaListener(messageListener);
         listeners.clear();
-        chatManager = null;
     }
 
     @Override
     public void disposeConnection() {
-        chatManager.removeIncomingListener(messageListener);
+        connection.removeAsyncStanzaListener(messageListener);
     }
 
     @Override
     public void reinitialize(final FortniteXMPP fortniteXMPP) {
-        chatManager = ChatManager.getInstanceFor(fortniteXMPP.connection());
-        chatManager.addIncomingListener(messageListener);
+        connection = fortniteXMPP.connection();
+        connection.addAsyncStanzaListener(messageListener, MessageTypeFilter.CHAT);
     }
 
     /**
      * Used for listening to incoming messages.
      * Once an incoming message is received all the listeners registered are fired.
      */
-    private final class MessageListener implements IncomingChatMessageListener {
-        @Override
-        public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
+    private final class MessageListener implements StanzaListener {
 
-            // ignore friend/party messages
-            try {
-                final var reader = Json.createReader(new StringReader(message.getBody()));
-                reader.readObject();
-                reader.close();
-            } catch (final Exception exception) {
-                listeners.forEach(listener -> listener.messageReceived(new me.vrekt.fortnitexmpp.chat.implementation.Message(from, message.getBody(), chat)));
-            }
+        @Override
+        public void processStanza(Stanza packet) {
+            final var message = (Message) packet;
+            listeners.forEach(listener -> listener.messageReceived(new me.vrekt.fortnitexmpp.chat.implementation.Message(message.getFrom(), message.getBody())));
         }
     }
 

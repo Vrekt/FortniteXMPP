@@ -29,7 +29,7 @@ public final class PublicPartyInGamePresence implements PartyPresence {
      * @param playersAlive      how many players are alive
      * @param serverPlayerCount the server player count
      */
-    public PublicPartyInGamePresence(final FortniteXMPP fortniteXMPP, final PlatformType platformType,
+    public PublicPartyInGamePresence(final FortniteXMPP fortniteXMPP, Party party, final PlatformType platformType,
                                      final String playing, final String sessionId, final String sessionKey, final String playlist,
                                      final int playersAlive, final int serverPlayerCount) {
         final var id = RandomStringUtils.randomAlphanumeric(32).toLowerCase();
@@ -39,14 +39,14 @@ public final class PublicPartyInGamePresence implements PartyPresence {
         final var properties = PresenceUtility.createBasicProperties()
                 .add("GamePlaylistName_s", playlist)
                 .add("Event_PlayersAlive_s", String.valueOf(playersAlive))
-                .add("Event_PartySize_s", "1")
-                .add("Event_PartyMaxSize_s", "4")
+                .add("Event_PartySize_s", String.valueOf(party.members().size()))
+                .add("Event_PartyMaxSize_s", String.valueOf(party.configuration().maxMembers()))
                 .add(Party.PARTY_DATA_INFO, partyJoinInfoData.build())
                 .add("ServerPlayerCount_i", serverPlayerCount)
                 .add("GameSessionJoinKey_s", sessionKey);
 
         this.status = Json.createObjectBuilder()
-                .add("Status", playing)
+                .add("Status", playing + " - " + party.members().size() + " / " + party.configuration().maxMembers())
                 .add("bIsPlaying", true)
                 .add("bIsJoinable", true)
                 .add("bHasVoiceSupport", false)
