@@ -17,6 +17,7 @@ As always, if you need further help or have any questions please contact me on d
 - Presence, click [here](https://github.com/Vrekt/FortniteXMPP2/wiki/Presence)
 - Connection stuff, click [here](https://github.com/Vrekt/FortniteXMPP2/wiki/Roster-and-better-connection-handling)
 - Using multiple accounts, click [here](https://github.com/Vrekt/FortniteXMPP2/wiki/Using-multiple-accounts)
+- Talking in party chat, click [here](https://github.com/Vrekt/FortniteXMPP/wiki/How-to-talk-in-party-chat)
 
 # People who have helped me along the way
 - [Kysune](https://github.com/SzymonLisowiec)
