@@ -5,6 +5,10 @@
 # FortniteXMPP2
 A library for interacting with Fortnite's XMPP service, manage parties, collect presences, chat with users, etc!
 
+# NOTE
+
+**PARTIES ARE NOT SUPPORTED WITH FORTNITEXMPP ANYMORE, FORTNITE CHANGED THEIR WHOLE SYSTEM. IF YOU WANT PARTY SUPPORT CHECK OUT MY OTHER PROJECT ATHENA**
+
 # Documentation
 Check out the [wiki](https://github.com/Vrekt/FortniteXMPP2/wiki). The wiki is still WIP, so expect some things to be missing.
 
