@@ -15,7 +15,7 @@ Check out the [wiki](https://github.com/Vrekt/FortniteXMPP2/wiki). The wiki is s
 As always, if you need further help or have any questions please contact me on discord: vrekt#4387
 
 - Getting started, click [here](https://github.com/Vrekt/FortniteXMPP2/wiki/Login-to-initialize-a-new-instance)
-- ---Parties, click [here](https://github.com/Vrekt/FortniteXMPP2/wiki/All-about-parties)---
+- ~~Parties, click [here](https://github.com/Vrekt/FortniteXMPP2/wiki/All-about-parties)~~
 - Friends, click [here](https://github.com/Vrekt/FortniteXMPP2/wiki/How-to-listen-for-certain-friend-events)
 - Chat, click [here](https://github.com/Vrekt/FortniteXMPP2/wiki/How-to-listen-and-reply-to-messages)
 - Presence, click [here](https://github.com/Vrekt/FortniteXMPP2/wiki/Presence)
@@ -29,7 +29,7 @@ As always, if you need further help or have any questions please contact me on d
 - [lorpus](https://github.com/lorpus)
 
 # Features 
-- ---Complete party support--- 
+- ~~Complete party support~~
 - Complete friend support, listen for requests, being rejected, etc.
 - Complete chat support, chat with other users.
 - Complete presence support, session ID, parties, and server information!
